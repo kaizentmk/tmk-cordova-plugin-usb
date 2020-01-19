@@ -1,0 +1,29 @@
+{
+  "name": "tmk-cordova-plugin-usb",
+  "version": "0.1.0",
+  "description": "Tmk Cordova plugin USB - Android >= 8.1 only",
+  "cordova": {
+    "id": "tmk-cordova-plugin-usb",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaizentmk/tmk-cordova-plugin-usb.git"
+  },
+  "keywords": [
+    "tmk",
+    "cordova",
+    "plugin",
+    "usb",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "Tmk",
+  "license": "Free for non commercial use. No warranty.",
+  "bugs": {
+    "url": "https://github.com/kaizentmk/tmk-cordova-plugin-usb/issues"
+  },
+  "homepage": "https://github.com/kaizentmk/tmk-cordova-plugin-usb#readme"
+}

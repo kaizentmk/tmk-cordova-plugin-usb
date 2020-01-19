@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xmlns="http://www.phonegap.com/ns/plugins/1.0"  -->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="tmk-cordova-plugin-usb" version="0.7.0">
+
+  <name>Tmk Cordova plugin USB - Android >= 8.1 only</name>
+
+  <engines>
+    <engine name="cordova" version=">=9.0.0"/>
+  </engines>
+
+  <asset src="www/tmk-usb.js" target="js/tmk-usb.js"/>
+
+  <js-module src="www/tmk-usb.js" name="tmkusb">
+    <clobbers target="cordova.plugins.tmkusb" />
+  </js-module>
+
+  <platform name="android">
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="TmkUsb">
+        <param name="android-package" value="tmk.cordova.plugin.usb.TmkUsb"/>
+      </feature>
+    </config-file>
+
+    <source-file src="src/android/tmk/cordova/plugin/usb/TmkUsb.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+  </platform>
+
+</plugin>
