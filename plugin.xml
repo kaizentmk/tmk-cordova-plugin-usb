@@ -22,7 +22,7 @@
       </feature>
     </config-file>
 
-    <source-file src="src/android/tmk/cordova/plugin/usb/TmkUsb.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsb.java" target-dir="src/tmk/cordova/plugin/usb/"/>
   </platform>
 
 </plugin>

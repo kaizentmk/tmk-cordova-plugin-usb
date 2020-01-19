@@ -42,8 +42,24 @@ cordova plugin add https://github.com/kaizentmk/tmk-cordova-plugin-usb.git
     }
 
     var failure = function() {
-        alert("Error calling Hello Plugin");
+        alert("Error calling TmkUsb Plugin");
     }
 
-    hello.greet("World", success, failure);
+    window.cordova.plugins.tmkusb.greet("World", success, failure);
 ~~~
+
+## Cordova dependency in android studio
+
+ [maven cordova framework for gradlew](https://mvnrepository.com/artifact/org.apache.cordova/framework)
+ build.gradlew (Module:app)
+ ~~~ groovy
+ dependencies {
+    implementation group: 'org.apache.cordova', name: 'framework', version: '8.0.0'
+ }
+ ~~~
+
+ ## Development
+
+ ~~~ bash
+git add . && git commit -am"Tmkcordovapluginusb" && git push --force origin master
+ ~~~
