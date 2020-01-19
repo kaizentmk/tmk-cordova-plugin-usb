@@ -1,9 +1,12 @@
 # tmk-cordova-plugin-usb
 
+min SDK version: 27
+Android >= 8.1 Oreo
+
 ## folders and files
 
-* /src          - platform sources (android -> java)
-* /www          - front end js
+* /android-usb  - android studio project - contains java files for the plugin; based on sample project USBEnumerator
+* /www          - cordova plugin js
 * plugin.xml    - plugin config and mapping
 
 ## info
