@@ -5,7 +5,7 @@ Android >= 8.1 Oreo
 
 ## folders and files
 
-* /android-usb  - android studio project - contains java files for the plugin; based on sample project USBEnumerator
+* /android-usb  - android studio project - contains java files for the plugin; based on sample project USBEnumerator. Only some classes are taken from here(see: plugin.xml)
 * /www          - cordova plugin js
 * plugin.xml    - plugin config and mapping
 

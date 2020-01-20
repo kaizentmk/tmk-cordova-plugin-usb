@@ -5,7 +5,7 @@
   <name>Tmk Cordova plugin USB - Android >= 8.1 only</name>
 
   <engines>
-    <engine name="cordova" version=">=9.0.0"/>
+    <engine name="cordova" version=">=8.0.0"/>
   </engines>
 
   <asset src="www/tmk-usb.js" target="js/tmk-usb.js"/>

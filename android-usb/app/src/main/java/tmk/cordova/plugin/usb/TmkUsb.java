@@ -6,6 +6,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * https://cordova.apache.org/docs/en/9.x/guide/platforms/android/plugin.html
+ */
 public class TmkUsb extends CordovaPlugin {
 
     private int count = 0;
@@ -47,17 +50,20 @@ public class TmkUsb extends CordovaPlugin {
 
     private boolean info(JSONArray data, CallbackContext callbackContext)
             throws JSONException {
+
+        System.out.println("------- tmk usb info");
+
         JSONObject jo = new JSONObject();
         jo.put("serviceName", this.getServiceName());
         jo.put("hasPermisssion", this.hasPermisssion());
-        callbackContext.success(jo);
+        callbackContext.success(jo.toString());
         return true;
     }
 
 
     private boolean listDevices(JSONArray data, CallbackContext callbackContext) {
         JSONArray ja = new JSONArray();
-        callbackContext.success(ja);
+        callbackContext.success(ja.toString());
         return true;
     }
 }

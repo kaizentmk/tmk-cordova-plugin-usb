@@ -15,11 +15,14 @@ function(error) {}: An error callback function. If the operation does not comple
 
 "service": The service name to call on the native side. This corresponds to a native class, for which more information is available in the native guides listed below.
 
-"action": The action name to call on the native side. This generally corresponds to the native class method. See the native guides listed below.
+"action": The action name to call on the native side. This generally corresponds to the native class method.
 
 [ arguments ]: An array of arguments to pass into the native environment.
 */
 
+/**
+ * exec(<successFunction>, <failFunction>, <service>, <action>, [<args>]);
+ */
 module.exports = {
     greet: function (name, successCallback, errorCallback) {
         cordova.exec(successCallback,
@@ -27,6 +30,13 @@ module.exports = {
             "TmkUsb",
             "greet",
             [name]);
+    },
+    notSupportedAction: function (successCallback, errorCallback) {
+        cordova.exec(successCallback,
+            errorCallback,
+            "TmkUsb",
+            "notSupportedAction",
+            []);
     },
     info: function (successCallback, errorCallback) {
         cordova.exec(successCallback,
