@@ -15,12 +15,17 @@
  */
 apply plugin: 'com.android.application'
 
+repositories {
+    google()
+    jcenter()
+}
+
 android {
-    compileSdkVersion 27
+    compileSdkVersion 26
     defaultConfig {
         applicationId "com.example.androidthings.usbenum"
-        minSdkVersion 27
-        targetSdkVersion 27
+        minSdkVersion 21
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }

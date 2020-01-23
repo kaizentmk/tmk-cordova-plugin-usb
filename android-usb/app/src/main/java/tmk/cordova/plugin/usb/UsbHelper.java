@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.androidthings.usbenum;
+package tmk.cordova.plugin.usb;
 
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;

@@ -23,33 +23,49 @@ function(error) {}: An error callback function. If the operation does not comple
 /**
  * exec(<successFunction>, <failFunction>, <service>, <action>, [<args>]);
  */
+const pluginName = "TmkUsb"
+
 module.exports = {
     greet: function (name, successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
-            "TmkUsb",
+            pluginName,
             "greet",
-            [name]);
+            [name])
     },
     notSupportedAction: function (successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
-            "TmkUsb",
+            pluginName,
             "notSupportedAction",
-            []);
+            [])
     },
     info: function (successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
-            "TmkUsb",
+            pluginName,
             "info",
-            []);
+            [])
     },
     listUsbDevices: function (successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
-            "TmkUsb",
+            pluginName,
             "listUsbDevices",
-            []);
+            [])
+    },
+    reset: function (successCallback, errorCallback) {
+        cordova.exec(successCallback,
+            errorCallback,
+            pluginName,
+            "reset",
+            [])
+    },
+    connect: function (successCallback, errorCallback) {
+        cordova.exec(successCallback,
+            errorCallback,
+            pluginName,
+            "connect",
+            [])
     }
 };

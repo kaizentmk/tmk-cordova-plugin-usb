@@ -15,14 +15,24 @@
   </js-module>
 
   <platform name="android">
+    <!-- One instance of a plugin object is created for the life of each WebView.  -->
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="TmkUsb">
         <param name="android-package" value="tmk.cordova.plugin.usb.TmkUsb"/>
+        <!-- Plugins are not instantiated until they are first referenced by a call from JavaScript, unless <param> with an onload name attribute is set to "true" in config.xml.  -->
+        <param name="onload" value="true" />
       </feature>
+
     </config-file>
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsb.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/UsbHelper.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/ConfigurationDescriptor.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/DeviceDescriptor.java" target-dir="src/tmk/cordova/plugin/usb/"/>
   </platform>
 
 </plugin>
