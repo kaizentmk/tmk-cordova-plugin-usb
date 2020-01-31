@@ -18,14 +18,15 @@ apply plugin: 'com.android.application'
 repositories {
     google()
     jcenter()
+    maven { url 'https://jitpack.io' }
 }
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.example.androidthings.usbenum"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
     }
@@ -42,4 +43,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.apache.cordova/framework
     implementation group: 'org.apache.cordova', name: 'framework', version: '8.0.0'
+    implementation 'com.github.mik3y:usb-serial-for-android:master'
+    implementation 'com.github.felHR85:UsbSerial:6.1.0'
 }

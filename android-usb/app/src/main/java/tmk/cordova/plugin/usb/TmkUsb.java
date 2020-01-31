@@ -12,6 +12,10 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
+import com.felhr.usbserial.UsbSerialDevice;
+import com.felhr.usbserial.UsbSerialInterface;
+import com.felhr.usbserial.UsbSerialInterface.UsbReadCallback;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -20,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,12 +49,12 @@ public class TmkUsb extends CordovaPlugin {
     private String mStatusView = "";
     private String mResultView = "";
 
-    private List<String> tmklogbuff = new ArrayList<>();
+    private static List<String> tmklogbuff = new ArrayList<>();
 
     private UsbDevice usbDevice;
 
     /* USB system service */
-    private UsbManager mUsbManager;
+    private UsbManager usbManager;
 
     /**
      * Broadcast receiver to handle USB disconnect events.
@@ -84,7 +89,7 @@ public class TmkUsb extends CordovaPlugin {
 
                     PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0,
                             new Intent(ACTION_USB_PERMISSION), 0);
-                    mUsbManager.requestPermission(device, permissionIntent);
+                    usbManager.requestPermission(device, permissionIntent);
                 }
             }
 
@@ -99,6 +104,24 @@ public class TmkUsb extends CordovaPlugin {
                 }
             }
         }
+    };
+
+    UsbReadCallback mCallback = new UsbSerialInterface.UsbReadCallback() {
+        @Override
+        public void onReceivedData(byte[] data) {
+            String s = "";
+            try {
+                s = new String(data, "UTF-8");
+                s.concat("/n");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                s.concat(e.getMessage());
+            }
+
+            tmklogbuff.add(s);
+        }
+
+
     };
 
     @Override
@@ -121,8 +144,8 @@ public class TmkUsb extends CordovaPlugin {
         context.registerReceiver(this.mUsbReceiver,
                 new IntentFilter(ACTION_USB_PERMISSION));
 
-//        mUsbManager = context.getSystemService(UsbManager.class);
-        mUsbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+//        usbManager = context.getSystemService(UsbManager.class);
+        usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 
         tmklogbuff.add("initialize: end");
     }
@@ -190,7 +213,7 @@ public class TmkUsb extends CordovaPlugin {
 
     private boolean listDevices(JSONArray data, CallbackContext callbackContext) throws JSONException {
 
-        HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
+        HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
 
         JSONObject jo = new JSONObject();
 
@@ -212,24 +235,133 @@ public class TmkUsb extends CordovaPlugin {
 
     private boolean connect() {
         try {
-            byte[] bytes = "T tmk".getBytes();
-            int TIMEOUT = 0;
-            boolean forceClaim = true;
-
-            tmklogbuff.add("sending data device = " + usbDevice);
-            if (usbDevice != null) {
+//            byte[] bytes = "T tmk".getBytes();
+//            int TIMEOUT = 0;
+//            boolean forceClaim = true;
 //
+//            tmklogbuff.add("sending data device = " + usbDevice);
+//            if (usbDevice != null) {
+////
+//                UsbInterface intf = usbDevice.getInterface(0);
+//                UsbEndpoint endpoint = intf.getEndpoint(0);
+//                UsbDeviceConnection connection = usbManager.openDevice(usbDevice);
+//                tmklogbuff.add("connection = " + connection);
+//
+//                if (connection != null) {
+//                    connection.claimInterface(intf, forceClaim);
+//
+//                    connection.bulkTransfer(endpoint, bytes, bytes.length, TIMEOUT); //do in another thread
+//                }
+//            }
+
+            ////////////////////////////////
+
+//            List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+
+            // Probe for our custom CDC devices, which use VID 0x1234
+// and PIDS 0x0001 and 0x0002.
+
+//            tmklogbuff.add("0 device:vid = " + usbDevice.getVendorId()
+//                    + ", pid = " + usbDevice.getProductId());
+//
+//            ProbeTable customTable = new ProbeTable();
+//            customTable.addProduct(0x2341, 0x0001, CdcAcmSerialDriver.class);
+////            customTable.addProduct(0x2341, 0x0002, CdcAcmSerialDriver.class);
+//
+//            tmklogbuff.add("0 customTable");
+//
+//            UsbSerialProber prober = new UsbSerialProber(customTable);
+//            List<UsbSerialDriver> availableDrivers = prober.findAllDrivers(usbManager);
+//
+//            tmklogbuff.add("1 availableDrivers = " + availableDrivers.size());
+//
+//            if (availableDrivers.isEmpty()) {
+//                return false;
+//            }
+//
+//            // Open a connection to the first available driver.
+//            UsbSerialDriver driver = availableDrivers.get(0);
+//            tmklogbuff.add("2 driver = " + driver);
+//
+//            UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
+//
+//            tmklogbuff.add("3 connection = " + connection);
+//
+//            if (connection == null) {
+//                // add UsbManager.requestPermission(driver.getDevice(), ..) handling here
+//                return false;
+//            }
+//
+//            UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
+//
+//            tmklogbuff.add("4 port = " + port);
+//
+//            port.open(connection);
+//            tmklogbuff.add("5 port opened");
+//
+//            port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+//
+//            tmklogbuff.add("6 port params");
+//
+//            byte[] request = "T tmk".getBytes();
+//            port.write(request, 1000);
+//            tmklogbuff.add("7 port written");
+
+            if (usbDevice.getVendorId() == 0x2341 // 9026
+                    && usbDevice.getProductId() == 0x003E) { // 62
+                tmklogbuff.add("Device match: " + usbDevice.getDeviceName());
+                tmklogbuff.add("Device =: " + usbDevice);
+
+                final UsbDeviceConnection connection = usbManager.openDevice(usbDevice);
+                String serial = connection.getSerial();
+                tmklogbuff.add("serial =: " + serial);
+
+                final byte[] bytes = "T tmk".getBytes();
+                final int TIMEOUT = 0;
+                boolean forceClaim = true;
+
+
                 UsbInterface intf = usbDevice.getInterface(0);
-                UsbEndpoint endpoint = intf.getEndpoint(0);
-                UsbDeviceConnection connection = mUsbManager.openDevice(usbDevice);
-                tmklogbuff.add("connection = " + connection);
+                final UsbEndpoint endpoint = intf.getEndpoint(0);
+                boolean b = connection.claimInterface(intf, forceClaim);
 
-                if (connection != null) {
-                    connection.claimInterface(intf, forceClaim);
+                tmklogbuff.add("b =: " + b);
 
-                    connection.bulkTransfer(endpoint, bytes, bytes.length, TIMEOUT); //do in another thread
+                final UsbSerialDevice serialPort = UsbSerialDevice.createUsbSerialDevice(usbDevice, connection);
+                tmklogbuff.add("serialPort =: " + serialPort);
+
+                if (serialPort != null) {
+                    if (serialPort.open()) { //Set Serial Connection Parameters.
+                        tmklogbuff.add("serialPort opened");
+                        serialPort.setBaudRate(9600);
+                        serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
+                        serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
+                        serialPort.setParity(UsbSerialInterface.PARITY_NONE);
+                        serialPort.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
+
+                        Thread thread = new Thread() {
+                            public void run() {
+//                                serialPort.write(bytes); //
+                                serialPort.read(mCallback);
+//                        connection.bulkTransfer(endpoint, bytes, bytes.length, TIMEOUT); //do in another thread
+                            }
+                        };
+
+                        cordova.getThreadPool().execute(thread);
+
+                    } else {
+                        Log.d("SERIAL", "PORT NOT OPEN");
+                    }
                 }
+
+
+
+            } else {
+                tmklogbuff.add("Device does not match");
             }
+
+
+            return true;
         } catch (Throwable t) {
             tmklogbuff.add("Cannot connect to the usb device: " + t.getMessage());
         }
@@ -259,4 +391,6 @@ public class TmkUsb extends CordovaPlugin {
         mResultView = result;
         Log.i(TAG, result);
     }
+
+
 }

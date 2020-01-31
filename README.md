@@ -61,6 +61,31 @@ cordova plugin add https://github.com/kaizentmk/tmk-cordova-plugin-usb.git
  }
  ~~~
 
+## Issues
+### building
+  /home/tmk/projs/tmk-cordova-plugin-usb/android-usb/app/src/main/java/com/example/androidthings/usbenum/UsbActivity.java:55: Error: Call requires API level 23 (current min is 21): android.content.Context#getSystemService [NewApi]
+          mUsbManager = getSystemService(UsbManager.class);
+
+
+
+ ## TODO
+
+ 1. Init broadcast receiver in initialize method. You can make it so the app will start automatically by adding an IntentFilter to the MainActivity. The IntentFilter triggers when any new device is attached. To explicitly specify the type of device by providing the vendor ID and/or product ID in an XML file.
+
+ 2. Query for all connected devices. All USB slave devices have a vendor and product ID.
+
+ 3. Check for matching vendor id. An Arduino’s vendor ID is always 0x2341 or 9025.
+
+ 4. Request user permission to access the device
+
+ 5. If permission granted open the device
+
+ 6. Create serial connection and set parameters
+
+ 7. Begin thread to continuously check for incomming data
+
+ 8. Display/write data. Take note that reading from the device is asynchronous, so it will continuously run in the background, receiving data as soon as possible. All data received is in the form of raw bytes, so it needs to be re-encoded into a readable format such as UTF-8.
+
  ## Development
 
  ~~~ bash

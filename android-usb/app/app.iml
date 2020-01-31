@@ -87,8 +87,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 26 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 29 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: org.apache.cordova:framework:8.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.mik3y:usb-serial-for-android:master@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.felHR85:UsbSerial:6.1.0@aar" level="project" />
   </component>
 </module>

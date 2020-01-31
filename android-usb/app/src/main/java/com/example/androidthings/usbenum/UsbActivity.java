@@ -52,7 +52,8 @@ public class UsbActivity extends Activity {
         mStatusView = (TextView) findViewById(R.id.text_status);
         mResultView = (TextView) findViewById(R.id.text_result);
 
-        mUsbManager = getSystemService(UsbManager.class);
+//        mUsbManager = getSystemService(UsbManager.class);
+        mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
 
         // Detach events are sent as a system-wide broadcast
         IntentFilter filter = new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED);
