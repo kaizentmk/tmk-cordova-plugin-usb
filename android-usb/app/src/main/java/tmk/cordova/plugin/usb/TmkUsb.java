@@ -120,8 +120,6 @@ public class TmkUsb extends CordovaPlugin {
 
             tmklogbuff.add(s);
         }
-
-
     };
 
     @Override
@@ -175,7 +173,7 @@ public class TmkUsb extends CordovaPlugin {
                     return listDevices(data, callbackContext);
                 case "reset":
                     return reset();
-                case "connect":
+                case "connectDevice":
                     return connect();
                 default:
                     callbackContext.error("Unsupported action: " + action);
@@ -355,7 +353,6 @@ public class TmkUsb extends CordovaPlugin {
                 }
 
 
-
             } else {
                 tmklogbuff.add("Device does not match");
             }
@@ -363,7 +360,7 @@ public class TmkUsb extends CordovaPlugin {
 
             return true;
         } catch (Throwable t) {
-            tmklogbuff.add("Cannot connect to the usb device: " + t.getMessage());
+            tmklogbuff.add("Cannot connectDevice to the usb device: " + t.getMessage());
         }
 
         return true;

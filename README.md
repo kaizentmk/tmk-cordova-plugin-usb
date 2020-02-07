@@ -67,6 +67,11 @@ cordova plugin add https://github.com/kaizentmk/tmk-cordova-plugin-usb.git
           mUsbManager = getSystemService(UsbManager.class);
 
 
+## WIP
+
+usbSerialDevice.open()
+
+
 
  ## TODO
 

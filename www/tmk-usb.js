@@ -33,27 +33,31 @@ module.exports = {
             "greet",
             [name])
     },
-    notSupportedAction: function (successCallback, errorCallback) {
+
+    write: function (text, successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
             pluginName,
-            "notSupportedAction",
-            [])
+            "write",
+            [text])
     },
-    info: function (successCallback, errorCallback) {
+
+    connect: function (successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
             pluginName,
-            "info",
+            "connect",
             [])
     },
-    listUsbDevices: function (successCallback, errorCallback) {
+
+    testAsync: function (successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
             pluginName,
-            "listUsbDevices",
+            "testAsync",
             [])
     },
+
     reset: function (successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
@@ -61,11 +65,41 @@ module.exports = {
             "reset",
             [])
     },
-    connect: function (successCallback, errorCallback) {
+
+    getLogs: function (successCallback, errorCallback) {
         cordova.exec(successCallback,
             errorCallback,
             pluginName,
-            "connect",
+            "getLogs",
             [])
     }
+
+    // notSupportedAction: function (successCallback, errorCallback) {
+    //     cordova.exec(successCallback,
+    //         errorCallback,
+    //         pluginName,
+    //         "notSupportedAction",
+    //         [])
+    // },
+    // info: function (successCallback, errorCallback) {
+    //     cordova.exec(successCallback,
+    //         errorCallback,
+    //         pluginName,
+    //         "info",
+    //         [])
+    // },
+    // listUsbDevices: function (successCallback, errorCallback) {
+    //     cordova.exec(successCallback,
+    //         errorCallback,
+    //         pluginName,
+    //         "listUsbDevices",
+    //         [])
+    // },
+    // reset: function (successCallback, errorCallback) {
+    //     cordova.exec(successCallback,
+    //         errorCallback,
+    //         pluginName,
+    //         "reset",
+    //         [])
+    // }
 };

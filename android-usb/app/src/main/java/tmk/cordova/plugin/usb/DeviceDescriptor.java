@@ -103,9 +103,9 @@ public class DeviceDescriptor {
     public String toString() {
         return String.format(
                 "Device Descriptor:\n"
-                + "Device Class: %s -> Subclass: 0x%02x -> Protocol: 0x%02x\n"
-                + "Max Packet Size: %d\n"
-                + "VID: 0x%04x\nPID: 0x%04x\n",
+                        + "Device Class: %s -> Subclass: 0x%02x -> Protocol: 0x%02x\n"
+                        + "Max Packet Size: %d\n"
+                        + "VID: 0x%04x\nPID: 0x%04x\n",
                 UsbHelper.nameForClass(deviceClass), deviceSubclass, deviceProtocol,
                 maxPacketSize, vendorId, productId
         );
