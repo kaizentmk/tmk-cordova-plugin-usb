@@ -4,7 +4,6 @@ package tmk.cordova.plugin.usb;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
-import android.util.Log;
 
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
@@ -16,15 +15,14 @@ import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-
 import static android.content.Context.USB_SERVICE;
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED;
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static tmk.cordova.plugin.usb.TmkUsbLogger.clearLogs;
+import static tmk.cordova.plugin.usb.TmkUsbLogger.getLogs;
+import static tmk.cordova.plugin.usb.TmkUsbLogger.getTime;
+import static tmk.cordova.plugin.usb.TmkUsbLogger.logtmk;
 
 /**
  * https://cordova.apache.org/docs/en/9.x/guide/platforms/android/plugin.html
@@ -38,8 +36,6 @@ public class TmkUsbPlugin extends CordovaPlugin {
             "tmk.cordova.plugin.usb.USB_PERMISSION";
 
     public static final String TAG = "drinker";
-    private static final int VENDOR_ID = 0x2341; // 9026
-    private static final int PRODUCT_ID = 0x003E; // 62
 
     /**
      * For keeping connection with the gui.
@@ -55,24 +51,9 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
     TmkUsbGui tmkUsbGui;
     TmkUsbBroadcastReceiver tmkUsbBroadcastReceiver;
+    TmkUsbConfig tmkUsbConfig;
 
     int count = 1;
-
-    static final int MAX_LOG_BUFF_SIZE = 1000;
-    private static final LinkedList<String> LOG_BUFF = new LinkedList<>();
-
-    public static String getTime() {
-        Date date = Calendar.getInstance().getTime();
-        return new SimpleDateFormat("HH:mm:ss.SSS").format(date);
-    }
-
-    public static synchronized void logtmk(final String msg) {
-        LOG_BUFF.add(getTime() + ": " + msg);
-        if (LOG_BUFF.size() > MAX_LOG_BUFF_SIZE) {
-            LOG_BUFF.removeLast();
-        }
-        Log.d(TAG, msg);
-    }
 
     UsbSerialInterface.UsbReadCallback usbReadCallback = data -> {
         String s = ("" + new String(data, UTF_8)).trim();
@@ -97,27 +78,22 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
         UsbManager usbManager = (UsbManager) context.getSystemService(USB_SERVICE);
 
+        tmkUsbConfig = new TmkUsbConfig();
+
         tmkUsbBroadcastReceiver = new TmkUsbBroadcastReceiver(
                 this,
                 usbManager,
-                VENDOR_ID,
-                PRODUCT_ID);
+                tmkUsbConfig);
 
-        context.registerReceiver(
-                tmkUsbBroadcastReceiver,
-                new IntentFilter(ACTION_USB_DEVICE_ATTACHED));
-
-        context.registerReceiver(
-                tmkUsbBroadcastReceiver,
-                new IntentFilter(ACTION_USB_DEVICE_DETACHED));
-
-        context.registerReceiver(
-                tmkUsbBroadcastReceiver,
-                new IntentFilter(ACTION_USB_PERMISSION));
+        registerReceiver(context);
 
         tmkUsbGui = new TmkUsbGui(cordova);
 
         tmkUsbBroadcastReceiver.listDevicesAndFindProperOne(context, usbManager);
+    }
+
+    public void setUsbSerialDevice(UsbSerialDevice usbSerialDevice) {
+        this.usbSerialDevice = usbSerialDevice;
     }
 
     @Override
@@ -189,18 +165,28 @@ public class TmkUsbPlugin extends CordovaPlugin {
     }
 
     private boolean sendLogs(final CallbackContext callbackContext) {
-        callbackContext.success(new JSONArray(LOG_BUFF));
+        callbackContext.success(new JSONArray(getLogs()));
         return true;
     }
 
     private boolean reset(final CallbackContext callbackContext) {
-        LOG_BUFF.clear();
+        clearLogs();
         this.count = 1;
         callbackContext.success("cleared");
         return true;
     }
 
-    public void setUsbSerialDevice(UsbSerialDevice usbSerialDevice) {
-        this.usbSerialDevice = usbSerialDevice;
+    private void registerReceiver(Context context) {
+        context.registerReceiver(
+                tmkUsbBroadcastReceiver,
+                new IntentFilter(ACTION_USB_DEVICE_ATTACHED));
+
+        context.registerReceiver(
+                tmkUsbBroadcastReceiver,
+                new IntentFilter(ACTION_USB_DEVICE_DETACHED));
+
+        context.registerReceiver(
+                tmkUsbBroadcastReceiver,
+                new IntentFilter(ACTION_USB_PERMISSION));
     }
 }

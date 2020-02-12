@@ -12,8 +12,8 @@ import java.util.Date;
 import static java.lang.Thread.sleep;
 import static org.apache.cordova.PluginResult.Status.ERROR;
 import static org.apache.cordova.PluginResult.Status.OK;
-import static tmk.cordova.plugin.usb.TmkUsbPlugin.getTime;
-import static tmk.cordova.plugin.usb.TmkUsbPlugin.logtmk;
+import static tmk.cordova.plugin.usb.TmkUsbLogger.getTime;
+import static tmk.cordova.plugin.usb.TmkUsbLogger.logtmk;
 
 public class TmkUsbGui {
 

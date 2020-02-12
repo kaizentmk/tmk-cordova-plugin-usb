@@ -19,25 +19,27 @@ import java.util.concurrent.ExecutorService;
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static tmk.cordova.plugin.usb.TmkUsbLogger.logtmk;
 import static tmk.cordova.plugin.usb.TmkUsbPlugin.ACTION_USB_PERMISSION;
 import static tmk.cordova.plugin.usb.TmkUsbPlugin.TAG;
-import static tmk.cordova.plugin.usb.TmkUsbPlugin.logtmk;
 
 public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
     final TmkUsbPlugin tmkUsbPlugin;
     final UsbManager usbManager;
+    final TmkUsbConfig tmkUsbConfig;
     final int vendorId;
     final int productId;
 
     public TmkUsbBroadcastReceiver(
             final TmkUsbPlugin tmkUsbPlugin,
             final UsbManager usbManager,
-            final int vendorId,
-            final int productId) {
+            final TmkUsbConfig tmkUsbConfig) {
         this.tmkUsbPlugin = tmkUsbPlugin;
         this.usbManager = usbManager;
-        this.vendorId = vendorId;
-        this.productId = productId;
+        this.tmkUsbConfig = tmkUsbConfig;
+
+        this.vendorId = tmkUsbConfig.getVendorId();
+        this.productId = tmkUsbConfig.getProductId();
     }
 
     public boolean isDeviceProperOne(UsbDevice device) {
@@ -140,6 +142,8 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
         if (!usbSerialDevice.open()) {
             throw new TmkUsbException("Device could not be opened");
         }
+
+        tmkUsbConfig.configure(usbSerialDevice);
 
         threadPool.execute(() -> usbSerialDevice.read(readCallback));
 

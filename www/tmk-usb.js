@@ -80,32 +80,4 @@ module.exports = {
             [])
     }
 
-    // notSupportedAction: function (successCallback, errorCallback) {
-    //     cordova.exec(successCallback,
-    //         errorCallback,
-    //         pluginName,
-    //         "notSupportedAction",
-    //         [])
-    // },
-    // info: function (successCallback, errorCallback) {
-    //     cordova.exec(successCallback,
-    //         errorCallback,
-    //         pluginName,
-    //         "info",
-    //         [])
-    // },
-    // listUsbDevices: function (successCallback, errorCallback) {
-    //     cordova.exec(successCallback,
-    //         errorCallback,
-    //         pluginName,
-    //         "listUsbDevices",
-    //         [])
-    // },
-    // reset: function (successCallback, errorCallback) {
-    //     cordova.exec(successCallback,
-    //         errorCallback,
-    //         pluginName,
-    //         "reset",
-    //         [])
-    // }
 };

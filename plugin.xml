@@ -28,6 +28,10 @@
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbPlugin.java" target-dir="src/tmk/cordova/plugin/usb/"/>
 
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbConfig.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbLogger.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbGui.java" target-dir="src/tmk/cordova/plugin/usb/"/>
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbBroadcastReceiver.java" target-dir="src/tmk/cordova/plugin/usb/"/>
