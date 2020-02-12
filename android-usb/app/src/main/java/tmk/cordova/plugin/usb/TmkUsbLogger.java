@@ -23,7 +23,9 @@ public class TmkUsbLogger {
         if (LOG_BUFF.size() > MAX_LOG_BUFF_SIZE) {
             LOG_BUFF.removeLast();
         }
+
         Log.d(TAG, msg);
+        LOG_BUFF.add(msg);
     }
 
     public synchronized static void clearLogs() {

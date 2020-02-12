@@ -120,7 +120,8 @@ public class TmkUsbPlugin extends CordovaPlugin {
                 case "greet":
                     return tmkUsbGui.greet(data, callbackContext);
                 case "write":
-                    return writeToTheUsbSerialDevice(data, callbackContext);
+                    callbackContext.success("preparing to write");
+                    return writeToTheUsbSerialDevice(data);
                 case "connect":
                     this.callbackContext = tmkUsbGui.connectWithGui(callbackContext);
                     return true;
@@ -141,7 +142,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
         }
     }
 
-    private boolean writeToTheUsbSerialDevice(JSONArray data, CallbackContext callbackContext) throws JSONException, TmkUsbException {
+    private boolean writeToTheUsbSerialDevice(JSONArray data) throws JSONException, TmkUsbException {
         if (usbSerialDevice == null
                 || !usbSerialDevice.isOpen()) {
             throw new TmkUsbException("Cannot write to the usb device - is null or not opened");
@@ -159,7 +160,6 @@ public class TmkUsbPlugin extends CordovaPlugin {
                 logtmk("cannot write: " + t.getMessage());
             }
         });
-
 
         return true;
     }
