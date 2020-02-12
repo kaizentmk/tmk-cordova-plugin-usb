@@ -53,7 +53,7 @@ public class TmkUsbGui {
             throw new TmkUsbException("cannot connect with gui: callbackContext is null");
         }
 
-        callbackContext.sendPluginResult(makeOkKeepPluginResult("connected"));
+        callbackContext.sendPluginResult(makeOkKeepPluginResult("usb plugin connected"));
         logtmk("connectWithGui: end");
         return callbackContext;
     }

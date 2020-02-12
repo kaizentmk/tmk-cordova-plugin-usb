@@ -27,7 +27,8 @@ const pluginName = "TmkUsb"
 
 module.exports = {
     greet: function (name, successCallback, errorCallback) {
-        cordova.exec(successCallback,
+        cordova.exec(
+            successCallback,
             errorCallback,
             pluginName,
             "greet",
@@ -35,7 +36,8 @@ module.exports = {
     },
 
     write: function (text, successCallback, errorCallback) {
-        cordova.exec(successCallback,
+        cordova.exec(
+            successCallback,
             errorCallback,
             pluginName,
             "write",
@@ -43,7 +45,8 @@ module.exports = {
     },
 
     connect: function (successCallback, errorCallback) {
-        cordova.exec(successCallback,
+        cordova.exec(
+            successCallback,
             errorCallback,
             pluginName,
             "connect",
@@ -51,7 +54,8 @@ module.exports = {
     },
 
     testAsync: function (successCallback, errorCallback) {
-        cordova.exec(successCallback,
+        cordova.exec(
+            successCallback,
             errorCallback,
             pluginName,
             "testAsync",
@@ -59,7 +63,8 @@ module.exports = {
     },
 
     reset: function (successCallback, errorCallback) {
-        cordova.exec(successCallback,
+        cordova.exec(
+            successCallback,
             errorCallback,
             pluginName,
             "reset",
@@ -67,7 +72,8 @@ module.exports = {
     },
 
     getLogs: function (successCallback, errorCallback) {
-        cordova.exec(successCallback,
+        cordova.exec(
+            successCallback,
             errorCallback,
             pluginName,
             "getLogs",

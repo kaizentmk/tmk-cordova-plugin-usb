@@ -81,9 +81,13 @@ public class TmkUsbPlugin extends CordovaPlugin {
             return;
         }
 
+        sendMsgToGui(s);
+    };
+
+    public void sendMsgToGui(final String s) {
         callbackContext.sendPluginResult(
                 tmkUsbGui.makeOkKeepPluginResult(getTime() + ": [[" + s + "]]"));
-    };
+    }
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {

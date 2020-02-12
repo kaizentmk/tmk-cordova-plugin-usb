@@ -137,17 +137,14 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
                         device,
                         usbManager.openDevice(device));
 
-//        usbSerialDevice.setBaudRate(9600); // 19200
-//        usbSerialDevice.setDataBits(UsbSerialInterface.DATA_BITS_8);
-//        usbSerialDevice.setParity(UsbSerialInterface.PARITY_NONE);
-//        usbSerialDevice.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
-//        usbSerialDevice.setStopBits(UsbSerialInterface.STOP_BITS_1);
-
         if (!usbSerialDevice.open()) {
             throw new TmkUsbException("Device could not be opened");
         }
 
         threadPool.execute(() -> usbSerialDevice.read(readCallback));
+
+        tmkUsbPlugin.sendMsgToGui("connected: device = " + device);
+
         return usbSerialDevice;
     }
 
