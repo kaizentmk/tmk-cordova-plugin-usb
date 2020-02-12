@@ -3,10 +3,14 @@ package tmk.cordova.plugin.usb;
 
 import android.content.Context;
 import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -36,6 +40,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
             "tmk.cordova.plugin.usb.USB_PERMISSION";
 
     public static final String TAG = "drinker";
+    private Gson gson;
 
     /**
      * For keeping connection with the gui.
@@ -48,6 +53,26 @@ public class TmkUsbPlugin extends CordovaPlugin {
      * for writing data to the usb device
      */
     UsbSerialDevice usbSerialDevice;
+
+    UsbDevice usbDevice;
+
+    UsbDeviceConnection connection;
+
+
+    public void setUsbSerialDevice(final UsbSerialDevice usbSerialDevice) {
+        this.usbSerialDevice = usbSerialDevice;
+    }
+
+    public void setUsbDevice(UsbDevice usbDevice) {
+        this.usbDevice = usbDevice;
+    }
+
+    public void setConnection(UsbDeviceConnection connection) {
+        this.connection = connection;
+    }
+
+    Context context;
+    UsbManager usbManager;
 
     TmkUsbGui tmkUsbGui;
     TmkUsbBroadcastReceiver tmkUsbBroadcastReceiver;
@@ -62,50 +87,80 @@ public class TmkUsbPlugin extends CordovaPlugin {
             return;
         }
 
-        sendMsgToGui(s);
+        sendOkMsgToGui(s);
     };
 
-    public void sendMsgToGui(final String s) {
-        callbackContext.sendPluginResult(
-                tmkUsbGui.makeOkKeepPluginResult(getTime() + ": [[" + s + "]]"));
+    public void sendOkMsgToGui(final String s) {
+        if (this.callbackContext == null) {
+            logtmk("sendOkMsgToGui: callbackContext is null");
+            return;
+        }
+
+        this.callbackContext.sendPluginResult(
+                this.tmkUsbGui.makeOkKeepPluginResult(
+                        getTime() + ": [[" + s + "]]"));
+    }
+
+    private void sendErrMsgToGui(String msg) {
+        if (this.callbackContext == null) {
+            logtmk("sendErrMsgToGui: callbackContext is null");
+            return;
+        }
+
+        this.callbackContext.sendPluginResult(
+                this.tmkUsbGui.makeErrorKeepPluginResult(msg));
     }
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
 
-        Context context = cordova.getContext();
+        try {
+            this.gson = new GsonBuilder()
+                    .setPrettyPrinting()
+                    .create();
 
-        UsbManager usbManager = (UsbManager) context.getSystemService(USB_SERVICE);
+            this.context = cordova.getContext();
 
-        tmkUsbConfig = new TmkUsbConfig();
+            this.usbManager = (UsbManager) context.getSystemService(USB_SERVICE);
 
-        tmkUsbBroadcastReceiver = new TmkUsbBroadcastReceiver(
-                this,
-                usbManager,
-                tmkUsbConfig);
+            this.tmkUsbGui = new TmkUsbGui();
 
-        registerReceiver(context);
-
-        tmkUsbGui = new TmkUsbGui(cordova);
-
-        tmkUsbBroadcastReceiver.listDevicesAndFindProperOne(context, usbManager);
+            this.tmkUsbConfig = new TmkUsbConfig();
+        } catch (Throwable t) {
+            sendErrMsgToGui("cannot initialize: t = " + t.getMessage());
+        }
     }
 
-    public void setUsbSerialDevice(UsbSerialDevice usbSerialDevice) {
-        this.usbSerialDevice = usbSerialDevice;
+    private void init() {
+        try {
+            tmkUsbBroadcastReceiver = new TmkUsbBroadcastReceiver(
+                    this,
+                    usbManager,
+                    tmkUsbConfig);
+
+            registerReceiver(context, tmkUsbBroadcastReceiver);
+
+            tmkUsbBroadcastReceiver.listDevicesAndFindProperOne(context, usbManager);
+        } catch (Throwable t) {
+            sendErrMsgToGui("cannot init: t = " + t.getMessage());
+        }
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        if (this.cordova != null && this.cordova.getContext() != null) {
-            this.cordova.getContext()
-                    .unregisterReceiver(tmkUsbBroadcastReceiver);
-        }
+        try {
+            super.onDestroy();
+            if (this.cordova != null && this.cordova.getContext() != null) {
+                this.cordova.getContext()
+                        .unregisterReceiver(tmkUsbBroadcastReceiver);
+            }
 
-        if (usbSerialDevice != null) {
-            usbSerialDevice.close();
+            if (usbSerialDevice != null) {
+                usbSerialDevice.close();
+            }
+        } catch (Throwable t) {
+            sendErrMsgToGui("cannot onDestroy: t = " + t.getMessage());
         }
     }
 
@@ -115,18 +170,27 @@ public class TmkUsbPlugin extends CordovaPlugin {
                            final CallbackContext callbackContext)
             throws JSONException {
 
+        sendOkMsgToGui("executing: action = " + action);
+
         try {
             switch (action) {
-                case "greet":
-                    return tmkUsbGui.greet(data, callbackContext);
-                case "write":
-                    callbackContext.success("preparing to write");
-                    return writeToTheUsbSerialDevice(data);
                 case "connect":
                     this.callbackContext = tmkUsbGui.connectWithGui(callbackContext);
                     return true;
-                case "testAsync":
-                    return tmkUsbGui.testAsync(this.callbackContext);
+                case "init":
+                    this.init();
+                    callbackContext.success("initialized");
+                    return true;
+                case "write":
+                    writeToTheUsbSerialDevice(data);
+                    callbackContext.success("written");
+                    return true;
+                case "resetConfig":
+                    tmkUsbConfig.resetToDefaults();
+                    sendOkMsgToGui("config set to default");
+                    return true;
+                case "getConfig":
+                    return sendConfig(callbackContext);
                 case "getLogs":
                     return sendLogs(callbackContext);
                 case "reset":
@@ -135,37 +199,58 @@ public class TmkUsbPlugin extends CordovaPlugin {
                     throw new TmkUsbException("Unsupported action: " + action);
             }
         } catch (Throwable t) {
+            String msg = "TmkUsbPluginError: " + t.getMessage();
             if (callbackContext != null) {
-                callbackContext.error("TmkUsbPluginError: " + t.getMessage());
+                callbackContext.error(msg);
             }
+            sendErrMsgToGui(msg);
+
             return false;
         }
     }
 
-    private boolean writeToTheUsbSerialDevice(JSONArray data) throws JSONException, TmkUsbException {
+    private boolean writeToTheUsbSerialDevice(
+            final JSONArray data)
+            throws JSONException, TmkUsbException {
+
         if (usbSerialDevice == null
                 || !usbSerialDevice.isOpen()) {
             throw new TmkUsbException("Cannot write to the usb device - is null or not opened");
         }
 
-        String s = data.getString(0) + " c=" + count++ + "\r\n";
+        String s = data.getString(0) + " c=" + count++ + tmkUsbConfig.getEndLine();
 
         cordova.getThreadPool().execute(() -> {
             try {
                 usbSerialDevice.write(s.getBytes());
 
-                this.callbackContext.sendPluginResult(
-                        this.tmkUsbGui.makeOkKeepPluginResult("passed to write: s = " + s));
+                sendOkMsgToGui("passed to write: s = " + s);
             } catch (Throwable t) {
-                logtmk("cannot write: " + t.getMessage());
+                String msg = "cannot write: " + t.getMessage();
+                logtmk(msg);
+                sendErrMsgToGui(msg);
             }
         });
 
         return true;
     }
 
+    private boolean sendConfig(final CallbackContext callbackContext) {
+        String device = UsbHelper.readDevice(usbDevice);
+
+        DeviceDescriptor deviceDescriptor =
+                DeviceDescriptor.fromDeviceConnection(connection);
+
+        callbackContext.success(
+                gson.toJson(this.tmkUsbConfig)
+                        + "\r\n" + gson.toJson(deviceDescriptor)
+                        + "\r\n" + device);
+
+        return true;
+    }
+
     private boolean sendLogs(final CallbackContext callbackContext) {
-        callbackContext.success(new JSONArray(getLogs()));
+        callbackContext.success(gson.toJson(getLogs()));
         return true;
     }
 
@@ -176,7 +261,9 @@ public class TmkUsbPlugin extends CordovaPlugin {
         return true;
     }
 
-    private void registerReceiver(Context context) {
+    private void registerReceiver(
+            final Context context,
+            final TmkUsbBroadcastReceiver tmkUsbBroadcastReceiver) {
         context.registerReceiver(
                 tmkUsbBroadcastReceiver,
                 new IntentFilter(ACTION_USB_DEVICE_ATTACHED));

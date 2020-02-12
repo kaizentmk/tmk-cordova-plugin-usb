@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
@@ -132,22 +133,25 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
             final UsbSerialInterface.UsbReadCallback readCallback)
             throws TmkUsbException {
 
-        logtmk("device = " + UsbHelper.readDevice(device));
-
+        final UsbDeviceConnection connection = usbManager.openDevice(device);
         final UsbSerialDevice usbSerialDevice = CDCSerialDevice
                 .createUsbSerialDevice(
                         device,
-                        usbManager.openDevice(device));
+                        connection);
 
         if (!usbSerialDevice.open()) {
             throw new TmkUsbException("Device could not be opened");
         }
 
+        this.tmkUsbPlugin.setUsbDevice(device);
+        this.tmkUsbPlugin.setConnection(connection);
+        this.tmkUsbPlugin.setUsbSerialDevice(usbSerialDevice);
+
         tmkUsbConfig.configure(usbSerialDevice);
 
         threadPool.execute(() -> usbSerialDevice.read(readCallback));
 
-        tmkUsbPlugin.sendMsgToGui("connected: device = " + device);
+        tmkUsbPlugin.sendOkMsgToGui("connected: device = " + device);
 
         return usbSerialDevice;
     }

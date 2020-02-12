@@ -26,13 +26,23 @@ function(error) {}: An error callback function. If the operation does not comple
 const pluginName = "TmkUsb"
 
 module.exports = {
-    greet: function (name, successCallback, errorCallback) {
+
+    connect: function (successCallback, errorCallback) {
         cordova.exec(
             successCallback,
             errorCallback,
             pluginName,
-            "greet",
-            [name])
+            "connect",
+            [])
+    },
+
+    init: function (successCallback, errorCallback) {
+        cordova.exec(
+            successCallback,
+            errorCallback,
+            pluginName,
+            "init",
+            [])
     },
 
     write: function (text, successCallback, errorCallback) {
@@ -44,30 +54,21 @@ module.exports = {
             [text])
     },
 
-    connect: function (successCallback, errorCallback) {
+    resetConfig: function (successCallback, errorCallback) {
         cordova.exec(
             successCallback,
             errorCallback,
             pluginName,
-            "connect",
+            "resetConfig",
             [])
     },
 
-    testAsync: function (successCallback, errorCallback) {
+    getConfig: function (successCallback, errorCallback) {
         cordova.exec(
             successCallback,
             errorCallback,
             pluginName,
-            "testAsync",
-            [])
-    },
-
-    reset: function (successCallback, errorCallback) {
-        cordova.exec(
-            successCallback,
-            errorCallback,
-            pluginName,
-            "reset",
+            "getConfig",
             [])
     },
 
@@ -77,6 +78,15 @@ module.exports = {
             errorCallback,
             pluginName,
             "getLogs",
+            [])
+    },
+
+    reset: function (successCallback, errorCallback) {
+        cordova.exec(
+            successCallback,
+            errorCallback,
+            pluginName,
+            "reset",
             [])
     }
 

@@ -13,8 +13,10 @@ import lombok.Setter;
 @Getter
 @Builder
 public class TmkUsbConfig {
-    public Integer vendorId;
-    public Integer productId;
+    private Integer vendorId;
+    private Integer productId;
+
+    private String endLine;
 
     private Integer baudRate;
     private Integer dataBits;
@@ -23,12 +25,18 @@ public class TmkUsbConfig {
     private Integer stopBits;
 
     public TmkUsbConfig() {
-        this.resetToDefaults();
+        reset();
+    }
+
+    private void reset() {
+        this.vendorId = 0x2341; // 9026
+        this.productId = 0x003E; // 62
+
+        this.endLine = "\r\n";
     }
 
     public void resetToDefaults() {
-        this.vendorId = 0x2341; // 9026
-        this.productId = 0x003E; // 62
+        reset();
 
         this.setBaudRate(9600); // 19200
         this.setDataBits(UsbSerialInterface.DATA_BITS_8);
