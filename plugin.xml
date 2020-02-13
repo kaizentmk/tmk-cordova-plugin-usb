@@ -2,7 +2,7 @@
 <!-- xmlns="http://www.phonegap.com/ns/plugins/1.0"  -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="tmk-cordova-plugin-usb" version="0.7.0">
 
-  <name>Tmk Cordova plugin USB - Android >= 8.1 only</name>
+  <name>Tmk Cordova plugin USB - Android >= 5.1</name>
 
   <engines>
     <engine name="cordova" version=">=8.0.0"/>
@@ -25,6 +25,8 @@
       </feature>
 
     </config-file>
+
+    <framework src="./build.gradle" custom="true" type="gradleReference" />
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbPlugin.java" target-dir="src/tmk/cordova/plugin/usb/"/>
 
