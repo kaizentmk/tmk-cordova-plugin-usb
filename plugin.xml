@@ -30,21 +30,26 @@
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbPlugin.java" target-dir="src/tmk/cordova/plugin/usb/"/>
 
-    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbConfig.java" target-dir="src/tmk/cordova/plugin/usb/"/>
-
-    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbLogger.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbLogging.java" target-dir="src/tmk/cordova/plugin/usb/"/>
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbGui.java" target-dir="src/tmk/cordova/plugin/usb/"/>
-
-    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbBroadcastReceiver.java" target-dir="src/tmk/cordova/plugin/usb/"/>
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/TmkUsbException.java" target-dir="src/tmk/cordova/plugin/usb/"/>
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/UsbHelper.java" target-dir="src/tmk/cordova/plugin/usb/"/>
 
-    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/ConfigurationDescriptor.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+    <!-- <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/ConfigurationDescriptor.java" target-dir="src/tmk/cordova/plugin/usb/"/> -->
 
-    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/DeviceDescriptor.java" target-dir="src/tmk/cordova/plugin/usb/"/>
+    <!-- device -->
+
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/device/DeviceDescriptor.java" target-dir="src/tmk/cordova/plugin/usb/device"/>
+
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/device/TmkUsbBroadcastReceiver.java" target-dir="src/tmk/cordova/plugin/usb/device"/>
+
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/device/TmkUsbConfig.java" target-dir="src/tmk/cordova/plugin/usb/device"/>
+
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/device/TmkUsbDevice.java" target-dir="src/tmk/cordova/plugin/usb/device"/>
+
   </platform>
 
 </plugin>

@@ -11,14 +11,14 @@ import static org.apache.cordova.PluginResult.Status.OK;
 @NoArgsConstructor
 public class TmkUsbGui {
 
-    public static final TmkUsbGui TMK_USB_GUI =
-            new TmkUsbGui();
+    public static final TmkUsbGui INSTANCE = new TmkUsbGui();
 
+    public static final String GUI_CONNECTED_MSG = "usb.plugin.gui.connected";
 
     public CallbackContext connectWithGui(
             final CallbackContext callbackContext) {
 
-        callbackContext.sendPluginResult(makeOkKeepPluginResult("usb plugin connected"));
+        callbackContext.sendPluginResult(makeOkKeepPluginResult(GUI_CONNECTED_MSG));
 
         return callbackContext;
     }

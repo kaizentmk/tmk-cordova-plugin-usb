@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tmk.cordova.plugin.usb;
+package com.example.androidthings.usbenum;
 
 import android.hardware.usb.UsbDeviceConnection;
 
@@ -22,6 +22,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import tmk.cordova.plugin.usb.UsbHelper;
 
 /**
  * Structured response for a USB configuration descriptor.

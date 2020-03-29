@@ -1,4 +1,4 @@
-package tmk.cordova.plugin.usb;
+package tmk.cordova.plugin.usb.device;
 
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
@@ -13,6 +13,9 @@ import lombok.Setter;
 @Getter
 @Builder
 public class TmkUsbConfig {
+
+    public static final TmkUsbConfig INSTANCE = new TmkUsbConfig();
+
     private Integer vendorId;
     private Integer productId;
 

@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package tmk.cordova.plugin.usb;
+package tmk.cordova.plugin.usb.device;
 
 import android.hardware.usb.UsbDeviceConnection;
+
+import tmk.cordova.plugin.usb.UsbHelper;
 
 /**
  * Structured response for a USB device descriptor.

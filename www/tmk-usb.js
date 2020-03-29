@@ -27,21 +27,21 @@ const pluginName = "TmkUsb"
 
 module.exports = {
 
-    connect: function (successCallback, errorCallback) {
+    connectGui: function (successCallback, errorCallback) {
         cordova.exec(
             successCallback,
             errorCallback,
             pluginName,
-            "connect",
+            "connectGui",
             [])
     },
 
-    init: function (successCallback, errorCallback) {
+    connectDevice: function (successCallback, errorCallback) {
         cordova.exec(
             successCallback,
             errorCallback,
             pluginName,
-            "init",
+            "connectDevice",
             [])
     },
 

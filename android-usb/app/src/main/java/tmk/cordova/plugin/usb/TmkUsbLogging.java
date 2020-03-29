@@ -9,7 +9,7 @@ import java.util.LinkedList;
 
 import static tmk.cordova.plugin.usb.TmkUsbPlugin.TAG;
 
-public class TmkUsbLogger {
+public class TmkUsbLogging {
 
     static final int MAX_LOG_BUFF_SIZE = 1000;
     public static final LinkedList<String> LOG_BUFF = new LinkedList<>();
