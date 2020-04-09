@@ -54,40 +54,12 @@ module.exports = {
             [text])
     },
 
-    resetConfig: function (successCallback, errorCallback) {
+    dispatch: function (command, successCallback, errorCallback) {
         cordova.exec(
             successCallback,
             errorCallback,
             pluginName,
-            "resetConfig",
-            [])
-    },
-
-    getConfig: function (successCallback, errorCallback) {
-        cordova.exec(
-            successCallback,
-            errorCallback,
-            pluginName,
-            "getConfig",
-            [])
-    },
-
-    getLogs: function (successCallback, errorCallback) {
-        cordova.exec(
-            successCallback,
-            errorCallback,
-            pluginName,
-            "getLogs",
-            [])
-    },
-
-    reset: function (successCallback, errorCallback) {
-        cordova.exec(
-            successCallback,
-            errorCallback,
-            pluginName,
-            "reset",
-            [])
+            "dispatch",
+            [command])
     }
-
 };

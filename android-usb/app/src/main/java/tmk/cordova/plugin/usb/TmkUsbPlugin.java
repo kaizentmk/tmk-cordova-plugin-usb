@@ -1,6 +1,7 @@
 package tmk.cordova.plugin.usb;
 
 import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 
 import com.felhr.usbserial.UsbSerialInterface;
@@ -14,14 +15,16 @@ import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import tmk.cordova.plugin.usb.device.DeviceDescriptor;
 import tmk.cordova.plugin.usb.device.TmkUsbBroadcastReceiver;
-import tmk.cordova.plugin.usb.device.TmkUsbConfig;
 import tmk.cordova.plugin.usb.device.TmkUsbDevice;
+import tmk.cordova.plugin.usb.device.TmkUsbDeviceConfig;
 
 import static android.content.Context.USB_SERVICE;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static tmk.cordova.plugin.usb.TmkUsbLogging.getTime;
+import static tmk.cordova.plugin.usb.TmkUsbLogging.getLogs;
 import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmk;
+import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmkerr;
 
 /**
  * https://cordova.apache.org/docs/en/9.x/guide/platforms/android/plugin.html
@@ -32,10 +35,7 @@ import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmk;
 public class TmkUsbPlugin extends CordovaPlugin {
 
     public static final String TAG = "drinker";
-
-    public static final String DEVICE_CONNECTING_MSG = "tmk.usb.plugin.device.connecting";
-    public static final String DEVICE_WRITING_MSG = "tmk.usb.plugin.device.writing";
-    public static final String ACTION_ERR_MSG = "tmk.usb.plugin.action.unsupported";
+    public static final String tag = "tup::";
 
     private Gson gson;
 
@@ -56,11 +56,12 @@ public class TmkUsbPlugin extends CordovaPlugin {
             return;
         }
 
-        sendOkMsgToGui(s);
+        sendOkMsgToGui(s, "device.read");
     };
 
     @Override
     public void initialize(final CordovaInterface cordova, final CordovaWebView webView) {
+        logtmk(tag, "initialize: start");
 
         super.initialize(cordova, webView);
 
@@ -74,14 +75,15 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
             this.tmkUsbGui = TmkUsbGui.INSTANCE;
             this.tmkUsbDevice =
-                    new TmkUsbDevice(cordova, usbManager, TmkUsbConfig.INSTANCE, readCallback);
+                    new TmkUsbDevice(cordova, usbManager, TmkUsbDeviceConfig.INSTANCE, readCallback);
 
             this.tmkUsbBroadcastReceiver =
                     new TmkUsbBroadcastReceiver(usbManager, this.tmkUsbDevice);
             this.tmkUsbBroadcastReceiver.register(cordova.getContext());
 
+            logtmk(tag, "initialize: end");
         } catch (Throwable t) {
-            sendErrMsgToGui("cannot initialize: t = " + t.getMessage());
+            logtmkerr(tag, "initialize: error: ", t.getMessage());
         }
     }
 
@@ -91,95 +93,124 @@ public class TmkUsbPlugin extends CordovaPlugin {
                            final CallbackContext callbackContext)
             throws JSONException {
 
-        sendOkMsgToGui("executing: action = " + action);
+        logtmk(tag, "execute: start: action: " + action, " , data: " + data);
 
         try {
             switch (action) {
                 case "connectGui":
                     this.callbackContext = tmkUsbGui.connectWithGui(callbackContext);
+                    logtmk(tag, "execute: end: action: " + action);
                     return true;
                 case "connectDevice":
-                    callbackContext.success(DEVICE_CONNECTING_MSG);
+                    callbackContext.success(
+                            this.tmkUsbGui.msg("connecting", "device"));
                     UsbDevice device = this.tmkUsbDevice.listDevicesAndFindProperOne();
                     tmkUsbBroadcastReceiver.requestPermission(cordova.getContext(), device);
+                    logtmk(tag, "execute: end: action: " + action);
                     return true;
                 case "write":
-                    callbackContext.success(DEVICE_WRITING_MSG);
+                    callbackContext.success(
+                            this.tmkUsbGui.msg("writing", "device"));
                     tmkUsbDevice.write(data.getString(0));
+                    logtmk(tag, "execute: end: action: " + action);
                     return true;
-//                case "resetConfig":
-//                    tmkUsbConfig.resetToDefaults();
-//                    sendOkMsgToGui("config set to default");
-//                    return true;
-//                case "getConfig":
-//                    return sendConfig(callbackContext);
-//                case "getLogs":
-//                    return sendLogs(callbackContext);
-//                case "reset":
-//                    return reset(callbackContext);
+                case "dispatch":
+                    return dispatch(data, callbackContext);
                 default:
-                    throw new TmkUsbException(ACTION_ERR_MSG + ":" + action);
+                    throw new TmkUsbException("action not supported: " + action);
             }
         } catch (Throwable t) {
-            String msg = "TmkUsbPluginError: " + t.getMessage();
+            String msg = "execute: error: action = " + action + "" + t.getMessage();
+            logtmkerr(tag, msg);
+
             if (callbackContext != null) {
                 callbackContext.error(msg);
             }
-            sendErrMsgToGui(msg);
+
+            sendErrMsgToGui(msg, "plugin.execute.error");
 
             return false;
         }
     }
 
-//
-//
-//    private boolean sendConfig(final CallbackContext callbackContext) {
-//        String device = UsbHelper.readDevice(usbDevice);
-//
-//        DeviceDescriptor deviceDescriptor =
-//                DeviceDescriptor.fromDeviceConnection(connection);
-//
-//        callbackContext.success(
-//                gson.toJson(this.tmkUsbConfig)
-//                        + "\r\n" + gson.toJson(deviceDescriptor)
-//                        + "\r\n" + device);
-//
-//        return true;
-//    }
-//
-//    private boolean sendLogs(final CallbackContext callbackContext) {
-//        callbackContext.success(gson.toJson(getLogs()));
-//        return true;
-//    }
-//
-//    private boolean reset(final CallbackContext callbackContext) {
-//        clearLogs();
-//        this.count = 1;
-//        callbackContext.success("cleared");
-//        return true;
-//    }
+    private boolean dispatch(JSONArray data, CallbackContext callbackContext)
+            throws JSONException {
 
+        String name = data.getString(0);
+        logtmk(tag, "dispatch: start: name = ", name);
 
-    public void sendOkMsgToGui(final String s) {
+        switch (name) {
+            case "getLogs":
+                logtmk(tag, "logs.sending");
+                callbackContext.success(
+                        this.tmkUsbGui.msg("sending", "plugin.logs"));
+                sendOkMsgToGui(gson.toJson(getLogs()), "plugin.logs");
+                logtmk(tag, "logs.sent");
+                return true;
+            case "clearLogs":
+                logtmk(tag, "logs.clearing");
+                callbackContext.success(
+                        this.tmkUsbGui.msg("pending", "plugin.logs.clearing"));
+                TmkUsbLogging.clearLogs();
+                sendOkMsgToGui("cleared", "plugin.logs");
+                logtmk(tag, "logs.cleared");
+                return true;
+            case "getUsbDeviceInfo":
+                logtmk(tag, "device.info.getting");
+                callbackContext.success(
+                        this.tmkUsbGui.msg("pending", "device.info.send"));
+                UsbDeviceConnection connection = tmkUsbDevice.getConnection();
+                if (connection != null) {
+                    sendOkMsgToGui(
+                            DeviceDescriptor.fromDeviceConnection(connection).toString(),
+                            "device.info");
+                    logtmk(tag, "device.info.sent");
+                    return true;
+                }
+
+                sendErrMsgToGui("connection.absence", "device.info.error");
+                logtmk(tag, "device.info.error", "connection.absence");
+                return false;
+
+            case "getUsbDeviceConfig":
+                logtmk(tag, "device.config.getting");
+                callbackContext.success(
+                        this.tmkUsbGui.msg("pending", "device.config"));
+                sendOkMsgToGui(
+                        gson.toJson(TmkUsbDeviceConfig.INSTANCE),
+                        "device.config");
+                logtmk(tag, "device.config.sent");
+                return true;
+        }
+
+        callbackContext.error("dispatch.unsupported");
+        sendErrMsgToGui("unsupported", "dispatch");
+        logtmkerr(tag, "dispatch.unsupported: name = " + name);
+        return false;
+    }
+
+    public void sendOkMsgToGui(final String msg, final String type) {
         if (this.callbackContext == null) {
-            logtmk("sendOkMsgToGui: callbackContext is null");
+            logtmk(tag, "sendOkMsgToGui: callbackContext is null");
             return;
         }
 
         this.callbackContext.sendPluginResult(
                 this.tmkUsbGui.makeOkKeepPluginResult(
-                        getTime() + ": [[" + s + "]]"));
+                        this.tmkUsbGui.msg(msg, type)));
     }
 
-    private void sendErrMsgToGui(String msg) {
+    private void sendErrMsgToGui(final String msg, final String type) {
         if (this.callbackContext == null) {
-            logtmk("sendErrMsgToGui: callbackContext is null");
+            logtmkerr(tag, "sendErrMsgToGui: callbackContext is null");
             return;
         }
 
         this.callbackContext.sendPluginResult(
-                this.tmkUsbGui.makeErrorKeepPluginResult(msg));
+                this.tmkUsbGui.makeErrorKeepPluginResult(
+                        this.tmkUsbGui.msg(msg, type)));
     }
+
 
     @Override
     public void onDestroy() {
@@ -192,7 +223,9 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
             tmkUsbDevice.onDestroy();
         } catch (Throwable t) {
-            sendErrMsgToGui("cannot onDestroy: t = " + t.getMessage());
+            String msg = "cannot onDestroy: t = " + t.getMessage();
+            logtmkerr(tag, msg);
+            sendErrMsgToGui(msg, "destroy.error");
         }
     }
 

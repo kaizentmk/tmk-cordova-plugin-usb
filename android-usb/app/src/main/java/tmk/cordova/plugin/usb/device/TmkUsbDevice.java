@@ -15,14 +15,18 @@ import java.util.Map;
 import tmk.cordova.plugin.usb.TmkUsbException;
 
 import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmk;
+import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmkerr;
 
 public class TmkUsbDevice {
+
+    public static final String tag = "tud::";
+
 
     public static final String DEVICE_CONNECTING_ERR_MSG = "device.connecting.err";
 
     final private CordovaInterface cordova;
     final private UsbManager usbManager;
-    final private TmkUsbConfig tmkUsbConfig;
+    final private TmkUsbDeviceConfig tmkUsbDeviceConfig;
     final UsbSerialInterface.UsbReadCallback readCallback;
 
     final int vendorId;
@@ -37,20 +41,22 @@ public class TmkUsbDevice {
     public TmkUsbDevice(
             final CordovaInterface cordova,
             final UsbManager usbManager,
-            final TmkUsbConfig tmkUsbConfig,
+            final TmkUsbDeviceConfig tmkUsbDeviceConfig,
             final UsbSerialInterface.UsbReadCallback readCallback) {
 
         this.cordova = cordova;
         this.usbManager = usbManager;
-        this.tmkUsbConfig = tmkUsbConfig;
+        this.tmkUsbDeviceConfig = tmkUsbDeviceConfig;
         this.readCallback = readCallback;
 
-        this.vendorId = tmkUsbConfig.getVendorId();
-        this.productId = tmkUsbConfig.getProductId();
+        this.vendorId = tmkUsbDeviceConfig.getVendorId();
+        this.productId = tmkUsbDeviceConfig.getProductId();
     }
 
     public UsbSerialDevice connect(final UsbDevice device)
             throws TmkUsbException {
+
+        logtmk(tag, "connect: start");
 
         final UsbDeviceConnection connection = usbManager.openDevice(device);
         final UsbSerialDevice usbSerialDevice = CDCSerialDevice
@@ -60,10 +66,12 @@ public class TmkUsbDevice {
             throw new TmkUsbException(DEVICE_CONNECTING_ERR_MSG);
         }
 
-        tmkUsbConfig.configure(usbSerialDevice);
+        tmkUsbDeviceConfig.configure(usbSerialDevice);
 
         cordova.getThreadPool()
                 .execute(() -> usbSerialDevice.read(readCallback));
+
+        logtmk(tag, "connect: end");
 
         return usbSerialDevice;
     }
@@ -76,14 +84,14 @@ public class TmkUsbDevice {
             throw new TmkUsbException("Cannot write to the usb device - is null or not opened");
         }
 
-        String s = text + tmkUsbConfig.getEndLine();
+        String s = text + tmkUsbDeviceConfig.getEndLine();
 
         cordova.getThreadPool().execute(() -> {
             try {
                 usbSerialDevice.write(s.getBytes());
             } catch (Throwable t) {
                 String msg = "cannot write: " + t.getMessage();
-                logtmk(msg);
+                logtmkerr(msg);
             }
         });
 
@@ -92,9 +100,12 @@ public class TmkUsbDevice {
 
     public UsbDevice listDevicesAndFindProperOne() throws TmkUsbException {
 
+        logtmk(tag, "listDevicesAndFindProperOne: start");
+
         // API 21 does not have streams...
         for (Map.Entry<String, UsbDevice> kv : usbManager.getDeviceList().entrySet()) {
             if (isDeviceProperOne(kv.getValue())) {
+                logtmk(tag, "listDevicesAndFindProperOne: end");
                 return kv.getValue();
             }
         }
@@ -118,4 +129,11 @@ public class TmkUsbDevice {
         }
     }
 
+    public UsbSerialDevice getUsbSerialDevice() {
+        return usbSerialDevice;
+    }
+
+    public UsbDeviceConnection getConnection() {
+        return connection;
+    }
 }

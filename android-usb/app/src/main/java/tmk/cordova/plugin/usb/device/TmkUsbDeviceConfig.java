@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
-public class TmkUsbConfig {
+public class TmkUsbDeviceConfig {
 
-    public static final TmkUsbConfig INSTANCE = new TmkUsbConfig();
+    public static final TmkUsbDeviceConfig INSTANCE = new TmkUsbDeviceConfig();
 
     private Integer vendorId;
     private Integer productId;
@@ -27,7 +27,7 @@ public class TmkUsbConfig {
     private Integer flowControl;
     private Integer stopBits;
 
-    public TmkUsbConfig() {
+    public TmkUsbDeviceConfig() {
         reset();
     }
 

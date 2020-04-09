@@ -12,9 +12,12 @@ import android.util.Log;
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED;
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
 import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmk;
+import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmkerr;
 import static tmk.cordova.plugin.usb.TmkUsbPlugin.TAG;
 
 public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
+
+    public static final String tag = "tubr::";
 
     public static final String ACTION_USB_PERMISSION =
             "tmk.cordova.plugin.usb.USB_PERMISSION";
@@ -32,22 +35,29 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+        logtmk(tag, "onReceive: device: ",
+                device.getManufacturerName(), device.getDeviceName());
+
         if (!tmkUsbDevice.isDeviceProperOne(device)) {
             return;
         }
 
+        String action = intent.getAction();
+        logtmk(tag, "onReceive: action = ", action);
+
         try {
-            switch (intent.getAction()) {
+            switch (action) {
                 case ACTION_USB_DEVICE_ATTACHED:
                     requestPermission(context, device);
                     break;
 
                 case ACTION_USB_PERMISSION:
                     Boolean granted = intent.getParcelableExtra(UsbManager.EXTRA_PERMISSION_GRANTED);
+                    logtmk(tag, "onReceive: granted = ", "" + granted);
+
                     if (granted) {
                         tmkUsbDevice.connect(device);
                     } else {
-                        logtmk("permission not granted");
                         requestPermission(context, device);
                     }
                     break;
@@ -61,16 +71,18 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
             }
         } catch (final Throwable t) {
             String msg = "Cannot handle: intent.action = "
-                    + intent.getAction()
+                    + action
                     + t.getMessage();
             Log.e(TAG, msg);
-            logtmk(msg);
+            logtmkerr(tag, msg);
         }
     }
 
     public void requestPermission(
             final Context context,
             final UsbDevice device) {
+
+        logtmk(tag, "requestPermission: start");
 
         PendingIntent permissionIntent = PendingIntent.getBroadcast(
                 context,
@@ -79,9 +91,13 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
                 0);
 
         usbManager.requestPermission(device, permissionIntent);
+
+        logtmk(tag, "requestPermission: end");
     }
 
     public void register(final Context context) {
+
+        logtmk(tag, "register: start");
 
         context.registerReceiver(
                 this,
@@ -94,5 +110,7 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
         context.registerReceiver(
                 this,
                 new IntentFilter(ACTION_USB_PERMISSION));
+
+        logtmk(tag, "register: start");
     }
 }

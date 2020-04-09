@@ -1,25 +1,38 @@
 package tmk.cordova.plugin.usb;
 
+import com.google.gson.Gson;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.NoArgsConstructor;
 
 import static org.apache.cordova.PluginResult.Status.ERROR;
 import static org.apache.cordova.PluginResult.Status.OK;
+import static tmk.cordova.plugin.usb.TmkUsbLogging.getTime;
+import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmk;
 
 @NoArgsConstructor
 public class TmkUsbGui {
 
     public static final TmkUsbGui INSTANCE = new TmkUsbGui();
 
-    public static final String GUI_CONNECTED_MSG = "usb.plugin.gui.connected";
+    public static final String tag = "tug::";
+
+    private Gson gson = new Gson();
 
     public CallbackContext connectWithGui(
             final CallbackContext callbackContext) {
+        logtmk(tag, "connectWithGui: start");
 
-        callbackContext.sendPluginResult(makeOkKeepPluginResult(GUI_CONNECTED_MSG));
+        callbackContext.sendPluginResult(
+                makeOkKeepPluginResult(
+                        msg("gui.connected", "gui")));
 
+        logtmk(tag, "connectWithGui: end");
         return callbackContext;
     }
 
@@ -33,5 +46,14 @@ public class TmkUsbGui {
         PluginResult result = new PluginResult(ERROR, msg);
         result.setKeepCallback(true);
         return result;
+    }
+
+    public String msg(final String msg, final String type) {
+        Map<String, String> data = new HashMap<>();
+        data.put("type", type);
+        data.put("time", getTime());
+        data.put("data", msg);
+
+        return gson.toJson(data);
     }
 }
