@@ -39,6 +39,8 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
     private Gson gson;
 
+    private CordovaInterface cordova;
+
     /**
      * For keeping connection with the gui.
      * Used in the TmkUsbBroadcastReceiver.
@@ -64,6 +66,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
         logtmk(tag, "initialize: start");
 
         super.initialize(cordova, webView);
+        this.cordova = cordova;
 
         try {
             this.gson = new GsonBuilder()
@@ -181,11 +184,34 @@ public class TmkUsbPlugin extends CordovaPlugin {
                         "device.config");
                 logtmk(tag, "device.config.sent");
                 return true;
+
+            case "kioskOn":
+                logtmk(tag, "kiosk.on.enabling");
+                callbackContext.success(
+                        this.tmkUsbGui.msg("pending", "kiosk.on"));
+                cordova.getActivity().startLockTask();
+                sendOkMsgToGui(
+                        gson.toJson(TmkUsbDeviceConfig.INSTANCE),
+                        "kiosk.on.enabled");
+                logtmk(tag, "kiosk.on.sent");
+                return true;
+
+            case "kioskOff":
+                logtmk(tag, "kiosk.off.enabling");
+                callbackContext.success(
+                        this.tmkUsbGui.msg("pending", "kiosk.off"));
+                cordova.getActivity().stopLockTask();
+                sendOkMsgToGui(
+                        gson.toJson(TmkUsbDeviceConfig.INSTANCE),
+                        "kiosk.off.enabled");
+                logtmk(tag, "kiosk.off.sent");
+                return true;
         }
 
-        callbackContext.error("dispatch.unsupported");
-        sendErrMsgToGui("unsupported", "dispatch");
-        logtmkerr(tag, "dispatch.unsupported: name = " + name);
+        String msg = "dispatch.unsupported: name = " + name;
+        callbackContext.error(msg);
+        sendErrMsgToGui(msg, "dispatch");
+        logtmkerr(tag, msg);
         return false;
     }
 
