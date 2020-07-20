@@ -5,15 +5,19 @@ import android.util.Log;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import static tmk.cordova.plugin.usb.TmkUsbPlugin.TAG;
 
 public class TmkUsbLogging {
 
     static final int MAX_LOG_BUFF_SIZE = 1024;
-    public static final LinkedList<String> LOG_BUFF = new LinkedList<>();
+//    public static final LinkedList<String> LOG_BUFF = new LinkedList<>();
+
+    public static final LinkedBlockingDeque<String> LOG_BUFF =
+            new LinkedBlockingDeque();
 
     public static synchronized String getTime() {
         Date date = Calendar.getInstance().getTime();
@@ -44,7 +48,7 @@ public class TmkUsbLogging {
         LOG_BUFF.clear();
     }
 
-    public static LinkedList<String> getLogs() {
+    public static Collection<String> getLogs() {
         return LOG_BUFF;
     }
 }

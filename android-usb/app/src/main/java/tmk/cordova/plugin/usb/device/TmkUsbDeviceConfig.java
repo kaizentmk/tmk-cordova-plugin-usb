@@ -41,7 +41,8 @@ public class TmkUsbDeviceConfig {
     public void resetToDefaults() {
         reset();
 
-        this.setBaudRate(9600); // 19200
+//        this.setBaudRate(9600); // 19200
+        this.setBaudRate(19200); // 19200
         this.setDataBits(UsbSerialInterface.DATA_BITS_8);
         this.setParity(UsbSerialInterface.PARITY_NONE);
         this.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);

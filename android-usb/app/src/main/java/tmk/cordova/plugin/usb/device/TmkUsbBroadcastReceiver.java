@@ -7,7 +7,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Parcelable;
 import android.util.Log;
+
+import com.felhr.usbserial.UsbSerialDevice;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import tmk.cordova.plugin.usb.TmkUsbPlugin;
 
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED;
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
@@ -20,16 +28,21 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
     public static final String tag = "tubr::";
 
     public static final String ACTION_USB_PERMISSION =
-            "tmk.cordova.plugin.usb.USB_PERMISSION";
+            "tmk.cordova.plugin.usb.device.USB_PERMISSION";
 
+    private UsbSerialDevice usbSerialDevice;
+
+    final TmkUsbPlugin tmkUsbPlugin;
     final UsbManager usbManager;
     final TmkUsbDevice tmkUsbDevice;
 
     public TmkUsbBroadcastReceiver(
+            final TmkUsbPlugin tmkUsbPlugin,
             final UsbManager usbManager,
             final TmkUsbDevice tmkUsbDevice) {
         this.usbManager = usbManager;
         this.tmkUsbDevice = tmkUsbDevice;
+        this.tmkUsbPlugin = tmkUsbPlugin;
     }
 
     @Override
@@ -37,6 +50,9 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
         UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
         logtmk(tag, "onReceive: device: ",
                 device.getManufacturerName(), device.getDeviceName());
+
+        logtmk(tag, "onReceive: usbSerialDevice: ",
+                "" + usbSerialDevice);
 
         if (!tmkUsbDevice.isDeviceProperOne(device)) {
             return;
@@ -52,17 +68,24 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
                     break;
 
                 case ACTION_USB_PERMISSION:
-                    Boolean granted = intent.getParcelableExtra(UsbManager.EXTRA_PERMISSION_GRANTED);
+                    if (usbSerialDevice != null) {
+                        return;
+                    }
+
+                    Parcelable granted = intent.getParcelableExtra(
+                            UsbManager.EXTRA_PERMISSION_GRANTED);
+                    logtmk(tag, "onReceive: granted = ",
+                            "" + (granted == null ? null : granted.getClass().getName()));
                     logtmk(tag, "onReceive: granted = ", "" + granted);
 
-                    if (granted) {
-                        tmkUsbDevice.connect(device);
-                    } else {
-                        requestPermission(context, device);
-                    }
+                    tmkUsbPlugin.sendOkMsgToGui("connecting", "device");
+                    usbSerialDevice = tmkUsbDevice.connect(device);
+                    tmkUsbPlugin.sendOkMsgToGui("connected", "device");
                     break;
 
                 case ACTION_USB_DEVICE_DETACHED:
+                    usbSerialDevice = null;
+                    tmkUsbPlugin.sendOkMsgToGui("detached", "device");
                     tmkUsbDevice.onDestroy();
                     break;
 
@@ -70,9 +93,14 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
                     //nope
             }
         } catch (final Throwable t) {
+            StringWriter sw = new StringWriter();
+            t.printStackTrace(new PrintWriter(sw));
+            String stackTraceStr = sw.toString();
+
             String msg = "Cannot handle: intent.action = "
                     + action
-                    + t.getMessage();
+                    + " " + t.getMessage()
+                    + " " + stackTraceStr;
             Log.e(TAG, msg);
             logtmkerr(tag, msg);
         }

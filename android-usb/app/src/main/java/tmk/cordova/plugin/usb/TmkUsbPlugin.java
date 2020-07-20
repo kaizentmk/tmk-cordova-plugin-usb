@@ -15,6 +15,10 @@ import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+
 import tmk.cordova.plugin.usb.device.DeviceDescriptor;
 import tmk.cordova.plugin.usb.device.TmkUsbBroadcastReceiver;
 import tmk.cordova.plugin.usb.device.TmkUsbDevice;
@@ -78,15 +82,22 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
             this.tmkUsbGui = TmkUsbGui.INSTANCE;
             this.tmkUsbDevice =
-                    new TmkUsbDevice(cordova, usbManager, TmkUsbDeviceConfig.INSTANCE, readCallback);
+                    new TmkUsbDevice(
+                            cordova,
+                            usbManager,
+                            TmkUsbDeviceConfig.INSTANCE,
+                            readCallback);
 
             this.tmkUsbBroadcastReceiver =
-                    new TmkUsbBroadcastReceiver(usbManager, this.tmkUsbDevice);
+                    new TmkUsbBroadcastReceiver(
+                            this,
+                            usbManager,
+                            this.tmkUsbDevice);
             this.tmkUsbBroadcastReceiver.register(cordova.getContext());
 
             logtmk(tag, "initialize: end");
         } catch (Throwable t) {
-            logtmkerr(tag, "initialize: error: ", t.getMessage());
+            logtmkerr(tag, "initialize: error: ", t.getMessage(), Arrays.toString(t.getStackTrace()));
         }
     }
 
@@ -106,14 +117,14 @@ public class TmkUsbPlugin extends CordovaPlugin {
                     return true;
                 case "connectDevice":
                     callbackContext.success(
-                            this.tmkUsbGui.msg("connecting", "device"));
+                            this.tmkUsbGui.msg("device", "connecting"));
                     UsbDevice device = this.tmkUsbDevice.listDevicesAndFindProperOne();
                     tmkUsbBroadcastReceiver.requestPermission(cordova.getContext(), device);
                     logtmk(tag, "execute: end: action: " + action);
                     return true;
                 case "write":
                     callbackContext.success(
-                            this.tmkUsbGui.msg("writing", "device"));
+                            this.tmkUsbGui.msg("device", "writing"));
                     tmkUsbDevice.write(data.getString(0));
                     logtmk(tag, "execute: end: action: " + action);
                     return true;
@@ -123,8 +134,12 @@ public class TmkUsbPlugin extends CordovaPlugin {
                     throw new TmkUsbException("action not supported: " + action);
             }
         } catch (Throwable t) {
-            String msg = "execute: error: action = " + action + "" + t.getMessage();
-            logtmkerr(tag, msg);
+            StringWriter sw = new StringWriter();
+            t.printStackTrace(new PrintWriter(sw));
+            String stackTraceStr = sw.toString();
+
+            String msg = "execute: error: action = " + action + ", " + stackTraceStr;
+            logtmkerr(tag, msg, Arrays.toString(t.getStackTrace()));
 
             if (callbackContext != null) {
                 callbackContext.error(msg);
@@ -146,14 +161,14 @@ public class TmkUsbPlugin extends CordovaPlugin {
             case "getLogs":
                 logtmk(tag, "logs.sending");
                 callbackContext.success(
-                        this.tmkUsbGui.msg("sending", "plugin.logs"));
-                sendOkMsgToGui(gson.toJson(getLogs()), "plugin.logs");
+                        this.tmkUsbGui.msg("plugin.logs", "sending"));
+                sendOkMsgToGui("plugin.logs", gson.toJson(getLogs()));
                 logtmk(tag, "logs.sent");
                 return true;
             case "clearLogs":
                 logtmk(tag, "logs.clearing");
                 callbackContext.success(
-                        this.tmkUsbGui.msg("pending", "plugin.logs.clearing"));
+                        this.tmkUsbGui.msg("plugin.logs.clearing", "pending"));
                 TmkUsbLogging.clearLogs();
                 sendOkMsgToGui("cleared", "plugin.logs");
                 logtmk(tag, "logs.cleared");
@@ -161,7 +176,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
             case "getUsbDeviceInfo":
                 logtmk(tag, "device.info.getting");
                 callbackContext.success(
-                        this.tmkUsbGui.msg("pending", "device.info.send"));
+                        this.tmkUsbGui.msg("device.info.send", "pending"));
                 UsbDeviceConnection connection = tmkUsbDevice.getConnection();
                 if (connection != null) {
                     sendOkMsgToGui(
@@ -178,7 +193,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
             case "getUsbDeviceConfig":
                 logtmk(tag, "device.config.getting");
                 callbackContext.success(
-                        this.tmkUsbGui.msg("pending", "device.config"));
+                        this.tmkUsbGui.msg("device.config", "pending"));
                 sendOkMsgToGui(
                         gson.toJson(TmkUsbDeviceConfig.INSTANCE),
                         "device.config");
@@ -188,7 +203,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
             case "kioskOn":
                 logtmk(tag, "kiosk.on.enabling");
                 callbackContext.success(
-                        this.tmkUsbGui.msg("pending", "kiosk.on"));
+                        this.tmkUsbGui.msg("kiosk.on", "pending"));
                 cordova.getActivity().startLockTask();
                 sendOkMsgToGui(
                         gson.toJson(TmkUsbDeviceConfig.INSTANCE),
@@ -199,7 +214,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
             case "kioskOff":
                 logtmk(tag, "kiosk.off.enabling");
                 callbackContext.success(
-                        this.tmkUsbGui.msg("pending", "kiosk.off"));
+                        this.tmkUsbGui.msg("kiosk.off", "pending"));
                 cordova.getActivity().stopLockTask();
                 sendOkMsgToGui(
                         gson.toJson(TmkUsbDeviceConfig.INSTANCE),
@@ -223,7 +238,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
         this.callbackContext.sendPluginResult(
                 this.tmkUsbGui.makeOkKeepPluginResult(
-                        this.tmkUsbGui.msg(msg, type)));
+                        this.tmkUsbGui.msg(type, msg)));
     }
 
     private void sendErrMsgToGui(final String msg, final String type) {
@@ -234,7 +249,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
         this.callbackContext.sendPluginResult(
                 this.tmkUsbGui.makeErrorKeepPluginResult(
-                        this.tmkUsbGui.msg(msg, type)));
+                        this.tmkUsbGui.msg(type, msg)));
     }
 
 
@@ -250,7 +265,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
             tmkUsbDevice.onDestroy();
         } catch (Throwable t) {
             String msg = "cannot onDestroy: t = " + t.getMessage();
-            logtmkerr(tag, msg);
+            logtmkerr(tag, msg, Arrays.toString(t.getStackTrace()));
             sendErrMsgToGui(msg, "destroy.error");
         }
     }

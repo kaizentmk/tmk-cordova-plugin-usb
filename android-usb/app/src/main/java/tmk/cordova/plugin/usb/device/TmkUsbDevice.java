@@ -10,6 +10,7 @@ import com.felhr.usbserial.UsbSerialInterface;
 
 import org.apache.cordova.CordovaInterface;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import tmk.cordova.plugin.usb.TmkUsbException;
@@ -20,7 +21,6 @@ import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmkerr;
 public class TmkUsbDevice {
 
     public static final String tag = "tud::";
-
 
     public static final String DEVICE_CONNECTING_ERR_MSG = "device.connecting.err";
 
@@ -91,7 +91,7 @@ public class TmkUsbDevice {
                 usbSerialDevice.write(s.getBytes());
             } catch (Throwable t) {
                 String msg = "cannot write: " + t.getMessage();
-                logtmkerr(msg);
+                logtmkerr(msg, Arrays.toString(t.getStackTrace()));
             }
         });
 
@@ -105,6 +105,7 @@ public class TmkUsbDevice {
         // API 21 does not have streams...
         for (Map.Entry<String, UsbDevice> kv : usbManager.getDeviceList().entrySet()) {
             if (isDeviceProperOne(kv.getValue())) {
+                logtmk(tag, "listDevicesAndFindProperOne: " + kv.getValue());
                 logtmk(tag, "listDevicesAndFindProperOne: end");
                 return kv.getValue();
             }

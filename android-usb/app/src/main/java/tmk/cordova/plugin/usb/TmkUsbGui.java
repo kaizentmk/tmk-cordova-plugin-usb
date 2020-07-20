@@ -30,7 +30,7 @@ public class TmkUsbGui {
 
         callbackContext.sendPluginResult(
                 makeOkKeepPluginResult(
-                        msg("gui.connected", "gui")));
+                        msg("gui", "connected")));
 
         logtmk(tag, "connectWithGui: end");
         return callbackContext;
@@ -48,7 +48,7 @@ public class TmkUsbGui {
         return result;
     }
 
-    public String msg(final String msg, final String type) {
+    public String msg(final String type, final String msg) {
         Map<String, String> data = new HashMap<>();
         data.put("type", type);
         data.put("time", getTime());
