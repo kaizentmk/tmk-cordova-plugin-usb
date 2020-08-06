@@ -98,7 +98,7 @@ public class TmkUsbDevice {
         return true;
     }
 
-    public UsbDevice listDevicesAndFindProperOne() throws TmkUsbException {
+    public UsbDevice listDevicesAndFindProperOne() throws TmkUsbDeviceNotFoundException {
 
         logtmk(tag, "listDevicesAndFindProperOne: start");
 
@@ -111,7 +111,9 @@ public class TmkUsbDevice {
             }
         }
 
-        throw new TmkUsbException("device not found");
+        logtmk(tag, "listDevicesAndFindProperOne: no proper device found");
+        logtmk(tag, "listDevicesAndFindProperOne: end");
+        throw new TmkUsbDeviceNotFoundException("device not found");
     }
 
     public boolean isDeviceProperOne(UsbDevice device) {

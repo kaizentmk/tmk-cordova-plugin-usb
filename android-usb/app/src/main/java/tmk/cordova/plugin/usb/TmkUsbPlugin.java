@@ -23,6 +23,7 @@ import tmk.cordova.plugin.usb.device.DeviceDescriptor;
 import tmk.cordova.plugin.usb.device.TmkUsbBroadcastReceiver;
 import tmk.cordova.plugin.usb.device.TmkUsbDevice;
 import tmk.cordova.plugin.usb.device.TmkUsbDeviceConfig;
+import tmk.cordova.plugin.usb.device.TmkUsbDeviceNotFoundException;
 
 import static android.content.Context.USB_SERVICE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -104,7 +105,7 @@ public class TmkUsbPlugin extends CordovaPlugin {
     @Override
     public boolean execute(final String action,
                            final JSONArray data,
-                           final CallbackContext callbackContext)
+                           final CallbackContext guiClbckCtx)
             throws JSONException {
 
         logtmk(tag, "execute: start: action: " + action, " , data: " + data);
@@ -112,24 +113,32 @@ public class TmkUsbPlugin extends CordovaPlugin {
         try {
             switch (action) {
                 case "connectGui":
-                    this.callbackContext = tmkUsbGui.connectWithGui(callbackContext);
+                    this.callbackContext = tmkUsbGui.connectWithGui(guiClbckCtx);
                     logtmk(tag, "execute: end: action: " + action);
                     return true;
                 case "connectDevice":
-                    callbackContext.success(
+                    guiClbckCtx.success(
                             this.tmkUsbGui.msg("device", "connecting"));
-                    UsbDevice device = this.tmkUsbDevice.listDevicesAndFindProperOne();
+                    UsbDevice device = null;
+                    try {
+                        device = this.tmkUsbDevice.listDevicesAndFindProperOne();
+                    } catch (final TmkUsbDeviceNotFoundException e) {
+                        guiClbckCtx.success(
+                                this.tmkUsbGui.msg("device", "not_found"));
+                        logtmk(tag, "execute: end: action: " + action);
+                        return true;
+                    }
                     tmkUsbBroadcastReceiver.requestPermission(cordova.getContext(), device);
                     logtmk(tag, "execute: end: action: " + action);
                     return true;
                 case "write":
-                    callbackContext.success(
+                    guiClbckCtx.success(
                             this.tmkUsbGui.msg("device", "writing"));
                     tmkUsbDevice.write(data.getString(0));
                     logtmk(tag, "execute: end: action: " + action);
                     return true;
                 case "dispatch":
-                    return dispatch(data, callbackContext);
+                    return dispatch(data, guiClbckCtx);
                 default:
                     throw new TmkUsbException("action not supported: " + action);
             }
@@ -141,8 +150,8 @@ public class TmkUsbPlugin extends CordovaPlugin {
             String msg = "execute: error: action = " + action + ", " + stackTraceStr;
             logtmkerr(tag, msg, Arrays.toString(t.getStackTrace()));
 
-            if (callbackContext != null) {
-                callbackContext.error(msg);
+            if (guiClbckCtx != null) {
+                guiClbckCtx.error(msg);
             }
 
             sendErrMsgToGui(msg, "plugin.execute.error");

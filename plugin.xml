@@ -46,6 +46,8 @@
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/device/TmkUsbBroadcastReceiver.java" target-dir="src/tmk/cordova/plugin/usb/device"/>
 
+    <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/device/TmkUsbDeviceNotFoundException.java" target-dir="src/tmk/cordova/plugin/usb/device"/>
+
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/device/TmkUsbDeviceConfig.java" target-dir="src/tmk/cordova/plugin/usb/device"/>
 
     <source-file src="android-usb/app/src/main/java/tmk/cordova/plugin/usb/device/TmkUsbDevice.java" target-dir="src/tmk/cordova/plugin/usb/device"/>
