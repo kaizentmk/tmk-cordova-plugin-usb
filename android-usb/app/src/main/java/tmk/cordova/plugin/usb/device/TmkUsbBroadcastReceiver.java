@@ -49,7 +49,11 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
         logtmk(tag, "onReceive: device: ",
-                device.getManufacturerName(), device.getDeviceName());
+                device.getManufacturerName(),
+                device.getDeviceName(),
+                "" + device.getVendorId(),
+                "" + device.getProductId(),
+                "" + device.getConfiguration(0));
 
         logtmk(tag, "onReceive: usbSerialDevice: ",
                 "" + usbSerialDevice);
@@ -139,6 +143,6 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
                 this,
                 new IntentFilter(ACTION_USB_PERMISSION));
 
-        logtmk(tag, "register: start");
+        logtmk(tag, "register: end");
     }
 }

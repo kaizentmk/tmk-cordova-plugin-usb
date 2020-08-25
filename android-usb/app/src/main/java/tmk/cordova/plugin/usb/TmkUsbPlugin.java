@@ -58,12 +58,14 @@ public class TmkUsbPlugin extends CordovaPlugin {
     TmkUsbBroadcastReceiver tmkUsbBroadcastReceiver;
 
     UsbSerialInterface.UsbReadCallback readCallback = data -> {
-        String s = ("" + new String(data, UTF_8)).trim();
-        if (s.isEmpty()) {
-            return;
-        }
 
-        sendOkMsgToGui(s, "device.read");
+//        String s = ("" + new String(data, UTF_8)).trim();
+//        if (s.isEmpty()) {
+//            return;
+//        }
+
+//        sendOkMsgToGui(s, "device.read");
+        sendOkMsgToGui(String.valueOf(data), "device.read");
     };
 
     @Override

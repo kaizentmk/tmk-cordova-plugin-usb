@@ -104,8 +104,10 @@ public class TmkUsbDevice {
 
         // API 21 does not have streams...
         for (Map.Entry<String, UsbDevice> kv : usbManager.getDeviceList().entrySet()) {
+            logtmk(tag, "listDevicesAndFindProperOne: ", "checking device",
+                    "" + kv.getValue().getVendorId(),
+                    "" + kv.getValue().getDeviceId());
             if (isDeviceProperOne(kv.getValue())) {
-                logtmk(tag, "listDevicesAndFindProperOne: " + kv.getValue());
                 logtmk(tag, "listDevicesAndFindProperOne: end");
                 return kv.getValue();
             }

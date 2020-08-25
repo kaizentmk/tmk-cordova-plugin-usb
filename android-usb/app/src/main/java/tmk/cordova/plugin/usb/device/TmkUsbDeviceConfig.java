@@ -32,8 +32,11 @@ public class TmkUsbDeviceConfig {
     }
 
     private void reset() {
-        this.vendorId = 0x2341; // 9026
-        this.productId = 0x003E; // 62
+//        this.vendorId = 0x2341; // 9026
+//        this.productId = 0x003E; // 62
+
+        this.vendorId = 9025;
+        this.productId = 61;
 
         this.endLine = "\r\n";
     }
@@ -41,12 +44,12 @@ public class TmkUsbDeviceConfig {
     public void resetToDefaults() {
         reset();
 
-//        this.setBaudRate(9600); // 19200
-        this.setBaudRate(19200); // 19200
-        this.setDataBits(UsbSerialInterface.DATA_BITS_8);
-        this.setParity(UsbSerialInterface.PARITY_NONE);
-        this.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
-        this.setStopBits(UsbSerialInterface.STOP_BITS_1);
+//        this.setBaudRate(9600);
+//        this.setBaudRate(19200);
+//        this.setDataBits(UsbSerialInterface.DATA_BITS_8);
+//        this.setParity(UsbSerialInterface.PARITY_NONE);
+//        this.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
+//        this.setStopBits(UsbSerialInterface.STOP_BITS_1);
     }
 
     public void configure(final UsbSerialDevice d) {
