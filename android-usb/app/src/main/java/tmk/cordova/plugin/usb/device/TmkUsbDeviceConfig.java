@@ -32,11 +32,11 @@ public class TmkUsbDeviceConfig {
     }
 
     private void reset() {
-//        this.vendorId = 0x2341; // 9026
-//        this.productId = 0x003E; // 62
+        this.vendorId = 0x2341; // 9026
+        this.productId = 0x003E; // 62
 
-        this.vendorId = 9025;
-        this.productId = 61;
+//        this.vendorId = 9025;
+//        this.productId = 61;
 
         this.endLine = "\r\n";
     }
@@ -44,7 +44,7 @@ public class TmkUsbDeviceConfig {
     public void resetToDefaults() {
         reset();
 
-//        this.setBaudRate(9600);
+        this.setBaudRate(9600);
 //        this.setBaudRate(19200);
 //        this.setDataBits(UsbSerialInterface.DATA_BITS_8);
 //        this.setParity(UsbSerialInterface.PARITY_NONE);

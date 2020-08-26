@@ -66,6 +66,8 @@ public class TmkUsbDevice {
             throw new TmkUsbException(DEVICE_CONNECTING_ERR_MSG);
         }
 
+        logtmk(tag, "device description: ", DeviceDescriptor.fromDeviceConnection(connection).toString());
+
         tmkUsbDeviceConfig.configure(usbSerialDevice);
 
         cordova.getThreadPool()

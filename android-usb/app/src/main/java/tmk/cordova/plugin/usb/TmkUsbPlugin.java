@@ -17,6 +17,7 @@ import org.json.JSONException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import tmk.cordova.plugin.usb.device.DeviceDescriptor;
@@ -26,7 +27,6 @@ import tmk.cordova.plugin.usb.device.TmkUsbDeviceConfig;
 import tmk.cordova.plugin.usb.device.TmkUsbDeviceNotFoundException;
 
 import static android.content.Context.USB_SERVICE;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static tmk.cordova.plugin.usb.TmkUsbLogging.getLogs;
 import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmk;
 import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmkerr;
@@ -58,14 +58,13 @@ public class TmkUsbPlugin extends CordovaPlugin {
     TmkUsbBroadcastReceiver tmkUsbBroadcastReceiver;
 
     UsbSerialInterface.UsbReadCallback readCallback = data -> {
-
-//        String s = ("" + new String(data, UTF_8)).trim();
-//        if (s.isEmpty()) {
-//            return;
-//        }
-
-//        sendOkMsgToGui(s, "device.read");
-        sendOkMsgToGui(String.valueOf(data), "device.read");
+        try {
+            String s = new String(data, "UTF-8");
+            sendOkMsgToGui(s, "device.read");
+        } catch (UnsupportedEncodingException e) {
+            logtmk(tag, "cannot read data from USB ",
+                    e.getMessage(), Arrays.toString(e.getStackTrace()));
+        }
     };
 
     @Override
@@ -100,7 +99,8 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
             logtmk(tag, "initialize: end");
         } catch (Throwable t) {
-            logtmkerr(tag, "initialize: error: ", t.getMessage(), Arrays.toString(t.getStackTrace()));
+            logtmkerr(tag, "initialize: error: ",
+                    t.getMessage(), Arrays.toString(t.getStackTrace()));
         }
     }
 
