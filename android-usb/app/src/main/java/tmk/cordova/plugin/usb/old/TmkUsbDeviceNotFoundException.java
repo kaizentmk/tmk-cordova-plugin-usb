@@ -1,4 +1,4 @@
-package tmk.cordova.plugin.usb.device;
+package tmk.cordova.plugin.usb.old;
 
 public class TmkUsbDeviceNotFoundException extends Exception {
     public TmkUsbDeviceNotFoundException(String message) {

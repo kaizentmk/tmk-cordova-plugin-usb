@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import tmk.cordova.plugin.usb.UsbHelper;
+import tmk.cordova.plugin.usb.old.UsbHelper;
 
 /**
  * Structured response for a USB configuration descriptor.

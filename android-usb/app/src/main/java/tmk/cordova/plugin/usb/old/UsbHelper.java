@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tmk.cordova.plugin.usb;
+package tmk.cordova.plugin.usb.old;
 
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;

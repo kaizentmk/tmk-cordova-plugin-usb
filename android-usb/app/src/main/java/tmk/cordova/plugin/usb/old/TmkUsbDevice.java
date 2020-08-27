@@ -1,4 +1,4 @@
-package tmk.cordova.plugin.usb.device;
+package tmk.cordova.plugin.usb.old;
 
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -15,8 +15,8 @@ import java.util.Map;
 
 import tmk.cordova.plugin.usb.TmkUsbException;
 
-import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmk;
-import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmkerr;
+import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmk;
+import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmkerr;
 
 public class TmkUsbDevice {
 

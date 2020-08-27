@@ -1,7 +1,6 @@
-package tmk.cordova.plugin.usb.device;
+package tmk.cordova.plugin.usb.old;
 
 import com.felhr.usbserial.UsbSerialDevice;
-import com.felhr.usbserial.UsbSerialInterface;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

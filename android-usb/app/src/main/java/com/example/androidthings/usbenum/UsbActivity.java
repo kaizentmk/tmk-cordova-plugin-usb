@@ -31,8 +31,8 @@ import android.widget.TextView;
 import java.text.ParseException;
 import java.util.HashMap;
 
-import tmk.cordova.plugin.usb.device.DeviceDescriptor;
-import tmk.cordova.plugin.usb.UsbHelper;
+import tmk.cordova.plugin.usb.old.DeviceDescriptor;
+import tmk.cordova.plugin.usb.old.UsbHelper;
 
 public class UsbActivity extends Activity {
     private static final String TAG = "UsbEnumerator";

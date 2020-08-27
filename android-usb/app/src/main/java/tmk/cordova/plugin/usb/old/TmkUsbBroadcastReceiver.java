@@ -1,4 +1,4 @@
-package tmk.cordova.plugin.usb.device;
+package tmk.cordova.plugin.usb.old;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -19,8 +19,8 @@ import tmk.cordova.plugin.usb.TmkUsbPlugin;
 
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED;
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
-import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmk;
-import static tmk.cordova.plugin.usb.TmkUsbLogging.logtmkerr;
+import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmk;
+import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmkerr;
 import static tmk.cordova.plugin.usb.TmkUsbPlugin.TAG;
 
 public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
