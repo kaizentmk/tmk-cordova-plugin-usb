@@ -12,6 +12,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class TmkUsbLogging {
 
     public static final String TAG = "drinker";
+    public static final String LOG_DOMAIN = "log";
 
     private static final Calendar calendar = Calendar.getInstance();
 

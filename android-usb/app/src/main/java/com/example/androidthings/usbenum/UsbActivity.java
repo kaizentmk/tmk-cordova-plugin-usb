@@ -92,6 +92,7 @@ public class UsbActivity extends Activity {
     /**
      * Determine whether to list all devices or query a specific device from
      * the provided intent.
+     *
      * @param intent Intent to query.
      */
     private void handleIntent(Intent intent) {
@@ -130,6 +131,7 @@ public class UsbActivity extends Activity {
 
     /**
      * Print a basic description about a specific USB device.
+     *
      * @param device USB device to query.
      */
     private void printDeviceDescription(UsbDevice device) {

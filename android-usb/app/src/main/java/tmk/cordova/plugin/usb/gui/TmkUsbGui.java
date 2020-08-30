@@ -19,13 +19,15 @@ import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmk;
 @NoArgsConstructor
 public class TmkUsbGui {
 
-    public static final TmkUsbGui INSTANCE = new TmkUsbGui();
-
+    public static final String GUI_DOMAIN = "gui";
     public static final String tag = "tug";
 
-    private Gson gson = new Gson();
-
+    private Gson gson;
     private CallbackContext callbackContext;
+
+    public TmkUsbGui(final Gson gson) {
+        this.gson = gson;
+    }
 
     public void connectWithGui(
             final CallbackContext callbackContext) {
@@ -34,7 +36,7 @@ public class TmkUsbGui {
 
         callbackContext.sendPluginResult(
                 makeOkKeepPluginResult(
-                        msg("gui", "connected")));
+                        msg(GUI_DOMAIN, "connected")));
 
         logtmk(tag, "connectWithGui: end");
         this.callbackContext = callbackContext;
@@ -61,13 +63,13 @@ public class TmkUsbGui {
                 makeOkKeepPluginResult(msg(domain, msg)));
     }
 
-    private void sendErrMsg(final String msg, final String type) {
+    public void sendErrMsg(final String domain, final String msg, final Throwable t) {
         if (clbckCtxIsNotSet()) {
             return;
         }
 
         this.callbackContext.sendPluginResult(
-                makeErrorKeepPluginResult(msg(type, msg)));
+                makeErrorKeepPluginResult(msg(domain, msg, t)));
     }
 
     public String msg(final String domain, final String msg) {
@@ -80,13 +82,13 @@ public class TmkUsbGui {
     }
 
     public String msg(final String domain, final String msg, final Throwable t) {
-        String[] msgs = {
-                msg,
-                t.getMessage(),
-                Arrays.toString(t.getStackTrace())
-        };
-
-        return msg(domain, Arrays.toString(msgs));
+        return msg(domain,
+                Arrays.toString(new String[]{
+                        msg,
+                        t.getMessage(),
+                        Arrays.toString(t.getStackTrace())
+                })
+        );
     }
 
     private boolean clbckCtxIsNotSet() {

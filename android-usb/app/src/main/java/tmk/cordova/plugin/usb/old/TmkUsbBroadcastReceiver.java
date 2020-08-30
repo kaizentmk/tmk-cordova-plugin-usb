@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.felhr.usbserial.UsbSerialDevice;
 
@@ -21,7 +20,6 @@ import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED;
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
 import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmk;
 import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmkerr;
-import static tmk.cordova.plugin.usb.TmkUsbPlugin.TAG;
 
 public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
 
@@ -82,14 +80,14 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
                             "" + (granted == null ? null : granted.getClass().getName()));
                     logtmk(tag, "onReceive: granted = ", "" + granted);
 
-                    tmkUsbPlugin.sendOkMsgToGui("connecting", "device");
+//                    tmkUsbPlugin.sendOkMsgToGui("connecting", "device");
                     usbSerialDevice = tmkUsbDevice.connect(device);
-                    tmkUsbPlugin.sendOkMsgToGui("connected", "device");
+//                    tmkUsbPlugin.sendOkMsgToGui("connected", "device");
                     break;
 
                 case ACTION_USB_DEVICE_DETACHED:
                     usbSerialDevice = null;
-                    tmkUsbPlugin.sendOkMsgToGui("detached", "device");
+//                    tmkUsbPlugin.sendOkMsgToGui("detached", "device");
                     tmkUsbDevice.onDestroy();
                     break;
 
@@ -105,7 +103,7 @@ public class TmkUsbBroadcastReceiver extends BroadcastReceiver {
                     + action
                     + " " + t.getMessage()
                     + " " + stackTraceStr;
-            Log.e(TAG, msg);
+//            Log.e(TAG, msg);
             logtmkerr(tag, msg);
         }
     }

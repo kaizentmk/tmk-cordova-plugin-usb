@@ -1,5 +1,12 @@
 package tmk.cordova.plugin.usb;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbManager;
+
+import com.felhr.usbserial.UsbSerialInterface;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -10,8 +17,26 @@ import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Objects;
+
+import tmk.cordova.plugin.usb.device.TmkDeviceUsbException;
+import tmk.cordova.plugin.usb.device.TmkUsbService;
 import tmk.cordova.plugin.usb.gui.TmkUsbGui;
 
+import static android.content.Context.USB_SERVICE;
+import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
+import static tmk.cordova.plugin.usb.device.TmkUsbDevice.ACTION_USB_DEVICE_ERROR;
+import static tmk.cordova.plugin.usb.device.TmkUsbDeviceConnection.ACTION_USB_DEVICE_CONNECTED;
+import static tmk.cordova.plugin.usb.device.TmkUsbDevicePermission.ACTION_USB_PERMISSION_NOT_GRANTED;
+import static tmk.cordova.plugin.usb.device.TmkUsbService.ACTION_USB_DEVICE_FIND;
+import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN;
+import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_CONNECTED;
+import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_CONNECTING;
+import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_DETACHED;
+import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_ERROR;
+import static tmk.cordova.plugin.usb.log.TmkUsbLogging.LOG_DOMAIN;
 import static tmk.cordova.plugin.usb.log.TmkUsbLogging.clearLogs;
 import static tmk.cordova.plugin.usb.log.TmkUsbLogging.getLogs;
 import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmk;
@@ -26,6 +51,7 @@ import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmkerr;
 public class TmkUsbPlugin extends CordovaPlugin {
 
     public static final String tag = "tup";
+    public static final String PLUGIN_DOMAIN = "plugin";
 
     public static final String ACTION_CONNECT_GUI = "connectGui";
     public static final String ACTION_CONNECT_DEVICE = "connectDevice";
@@ -34,9 +60,59 @@ public class TmkUsbPlugin extends CordovaPlugin {
     public static final String ACTION_DISPATCH_GET_LOGS = "getLogs";
     public static final String ACTION_DISPATCH_CLEAR_LOGS = "clearLogs";
 
-
+    private Context context;
     private TmkUsbGui tmkUsbGui;
+    private TmkUsbService tmkUsbService;
     private Gson gson;
+
+    private UsbSerialInterface.UsbReadCallback readCallback = data -> {
+        try {
+            String s = new String(data, "UTF-8");
+            if (s == null || s.trim().isEmpty()) {
+                return;
+            }
+
+            logtmk(tag, "readCallback", " s = " + s);
+            this.tmkUsbGui.sendOkMsg(DEVICE_DOMAIN, s);
+        } catch (UnsupportedEncodingException e) {
+            logtmkerr(tag, "cannot read data from USB ",
+                    e.getMessage(), Arrays.toString(e.getStackTrace()));
+            context.sendBroadcast(new Intent(ACTION_USB_DEVICE_ERROR)
+                    .putExtra(ACTION_USB_DEVICE_ERROR,
+                            new TmkDeviceUsbException("Cannot read data from usb", e)));
+        }
+    };
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            String action = intent.getAction();
+            logtmk(tag, "onReceive: action = " + action);
+
+            try {
+                if (ACTION_USB_DEVICE_CONNECTED.equals(action)) {
+                    tmkUsbGui.sendOkMsg(DEVICE_DOMAIN_CONNECTED, "connected");
+                }
+
+                if (ACTION_USB_PERMISSION_NOT_GRANTED.equals(action)) {
+                    throw new TmkUsbException("ACTION_USB_PERMISSION_NOT_GRANTED");
+                }
+
+                if (ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                    tmkUsbGui.sendOkMsg(DEVICE_DOMAIN_DETACHED, "detached");
+                }
+
+                if (ACTION_USB_DEVICE_ERROR.equals(action)) {
+                    throw (TmkDeviceUsbException) Objects.requireNonNull(intent.getExtras()
+                            .get(ACTION_USB_DEVICE_ERROR));
+                }
+            } catch (final Throwable t) {
+                String msg = "onReceive error: action = " + action;
+                logtmkerr(tag, msg, t);
+                tmkUsbGui.sendErrMsg(DEVICE_DOMAIN_ERROR, msg, t);
+            }
+        }
+    };
 
     @Override
     public void initialize(final CordovaInterface cordova, final CordovaWebView webView) {
@@ -45,23 +121,39 @@ public class TmkUsbPlugin extends CordovaPlugin {
             logtmk(tag, "initialize: start");
 
             super.initialize(cordova, webView);
-            this.tmkUsbGui = TmkUsbGui.INSTANCE;
             this.gson = new GsonBuilder()
                     .setPrettyPrinting()
+                    .disableHtmlEscaping()
                     .create();
+            this.tmkUsbGui = new TmkUsbGui(gson);
+
+            this.context = cordova.getContext();
+
+            UsbManager usbManager = (UsbManager) context.getSystemService(USB_SERVICE);
+
+            this.tmkUsbService = new TmkUsbService(
+                    context,
+                    usbManager,
+                    readCallback);
+
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_USB_DEVICE_CONNECTED);
+            filter.addAction(ACTION_USB_DEVICE_DETACHED);
+            filter.addAction(ACTION_USB_PERMISSION_NOT_GRANTED);
+            filter.addAction(ACTION_USB_DEVICE_ERROR);
+            context.registerReceiver(broadcastReceiver, filter);
 
             logtmk(tag, "initialize: end");
-
         } catch (Throwable t) {
             logtmkerr(tag, "initialize: error: ", t);
         }
     }
 
     @Override
-    public boolean execute(final String action,
-                           final JSONArray data,
-                           final CallbackContext clbckCtx)
-            throws JSONException {
+    public boolean execute(
+            final String action,
+            final JSONArray data,
+            final CallbackContext clbckCtx) {
 
         try {
             logtmk(tag, "execute: start", " action = " + action, " data = " + data);
@@ -74,9 +166,19 @@ public class TmkUsbPlugin extends CordovaPlugin {
                     return true;
 
                 case ACTION_CONNECT_DEVICE:
-                    clbckCtx.success(tmkUsbGui.msg("device", "connecting"));
-                    tmkUsbGui.sendOkMsg("device", "connected");
+                    clbckCtx.success(tmkUsbGui.msg(DEVICE_DOMAIN_CONNECTING, "connecting"));
+
+                    if (tmkUsbService.isSerialPortConnected()) {
+                        tmkUsbGui.sendOkMsg(DEVICE_DOMAIN_CONNECTED, "connected");
+                    } else {
+                        context.sendBroadcast(new Intent(ACTION_USB_DEVICE_FIND));
+                    }
+
                     logtmk(tag, "execute: end", " action = " + action);
+                    return true;
+
+                case ACTION_WRITE:
+                    tmkUsbService.write(data.getString(0).getBytes());
                     return true;
 
                 case ACTION_DISPATCH:
@@ -92,13 +194,17 @@ public class TmkUsbPlugin extends CordovaPlugin {
         }
     }
 
-    private void handleError(CallbackContext clbckCtx, String msg, Throwable t) {
+    private void handleError(
+            final CallbackContext clbckCtx,
+            final String msg,
+            final Throwable t) {
         logtmkerr(tag, msg, t);
-        clbckCtx.error(tmkUsbGui.msg("plugin", msg, t));
+        clbckCtx.error(tmkUsbGui.msg(PLUGIN_DOMAIN, msg, t));
     }
 
-    private boolean dispatch(final JSONArray data,
-                             final CallbackContext clbckCtx)
+    private boolean dispatch(
+            final JSONArray data,
+            final CallbackContext clbckCtx)
             throws JSONException {
 
         String cmdName = data.getString(0);
@@ -108,14 +214,14 @@ public class TmkUsbPlugin extends CordovaPlugin {
 
             switch (cmdName) {
                 case ACTION_DISPATCH_GET_LOGS:
-                    clbckCtx.success(tmkUsbGui.msg("log", "sending"));
-                    handleDispatchCmdResp(cmdName, "log", gson.toJson(getLogs()));
+                    clbckCtx.success(tmkUsbGui.msg(LOG_DOMAIN, "sending"));
+                    handleDispatchCmdResp(cmdName, LOG_DOMAIN, gson.toJson(getLogs()));
                     return true;
 
                 case ACTION_DISPATCH_CLEAR_LOGS:
-                    clbckCtx.success(tmkUsbGui.msg("log", "clearing"));
+                    clbckCtx.success(tmkUsbGui.msg(LOG_DOMAIN, "clearing"));
                     clearLogs();
-                    handleDispatchCmdResp(cmdName, "log", "cleared");
+                    handleDispatchCmdResp(cmdName, LOG_DOMAIN, "cleared");
                     return true;
 
                 default:
@@ -134,6 +240,24 @@ public class TmkUsbPlugin extends CordovaPlugin {
         tmkUsbGui.sendOkMsg(domain, cmdResult);
         logtmk(tag, "dispatch: end", " cmdName = " + cmdName);
     }
+
+    @Override
+    public void onDestroy() {
+        try {
+            super.onDestroy();
+            if (this.cordova != null && this.cordova.getContext() != null) {
+                this.cordova.getContext()
+                        .unregisterReceiver(broadcastReceiver);
+            }
+
+            tmkUsbService.onDestroy();
+        } catch (Throwable t) {
+            String msg = "cannot onDestroy: t = " + t.getMessage();
+            logtmkerr(tag, msg, Arrays.toString(t.getStackTrace()));
+            tmkUsbGui.sendErrMsg(PLUGIN_DOMAIN, msg, t);
+        }
+    }
+}
 
 
 //    public static final String TAG = "drinker";
@@ -377,5 +501,4 @@ public class TmkUsbPlugin extends CordovaPlugin {
 //            sendErrMsgToGui(msg, "destroy.error");
 //        }
 //    }
-
-}
+//}
