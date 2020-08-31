@@ -90,7 +90,7 @@
     <orderEntry type="library" name="Gradle: org.projectlombok:lombok:1.18.12@jar" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:15.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.6@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.cordova:framework:8.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.cordova:framework:9.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.mik3y:usb-serial-for-android:master@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.felHR85:UsbSerial:6.1.0@aar" level="project" />
   </component>
