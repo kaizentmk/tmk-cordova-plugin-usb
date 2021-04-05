@@ -31,9 +31,9 @@ import static tmk.cordova.plugin.usb.device.TmkUsbDevice.ACTION_USB_DEVICE_ERROR
 import static tmk.cordova.plugin.usb.device.TmkUsbDeviceConnection.ACTION_USB_DEVICE_CONNECTED;
 import static tmk.cordova.plugin.usb.device.TmkUsbDevicePermission.ACTION_USB_PERMISSION_NOT_GRANTED;
 import static tmk.cordova.plugin.usb.device.TmkUsbService.ACTION_USB_DEVICE_FIND;
-import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN;
 import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_CONNECTED;
 import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_CONNECTING;
+import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_DATA;
 import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_DETACHED;
 import static tmk.cordova.plugin.usb.device.TmkUsbService.DEVICE_DOMAIN_ERROR;
 import static tmk.cordova.plugin.usb.log.TmkUsbLogging.LOG_DOMAIN;
@@ -68,12 +68,14 @@ public class TmkUsbPlugin extends CordovaPlugin {
     private UsbSerialInterface.UsbReadCallback readCallback = data -> {
         try {
             String s = new String(data, "UTF-8");
-            if (s == null || s.trim().isEmpty()) {
-                return;
+            if (s == null) {
+                String msg = "data from device is null";
+                this.tmkUsbGui.sendErrMsg(DEVICE_DOMAIN_ERROR, msg,
+                        new TmkDeviceUsbException(msg));
             }
 
             logtmk(tag, "readCallback", " s = " + s);
-            this.tmkUsbGui.sendOkMsg(DEVICE_DOMAIN, s);
+            this.tmkUsbGui.sendOkMsg(DEVICE_DOMAIN_DATA, s);
         } catch (UnsupportedEncodingException e) {
             logtmkerr(tag, "cannot read data from USB ",
                     e.getMessage(), Arrays.toString(e.getStackTrace()));

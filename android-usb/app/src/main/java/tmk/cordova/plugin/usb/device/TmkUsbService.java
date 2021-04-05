@@ -22,11 +22,12 @@ import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmkerr;
 public class TmkUsbService {
 
     public static final String tag = "tus";
-    public static final String DEVICE_DOMAIN = "device";
-    public static final String DEVICE_DOMAIN_ERROR = "device.error";
-    public static final String DEVICE_DOMAIN_CONNECTING = "device.connecting";
-    public static final String DEVICE_DOMAIN_CONNECTED = "device.connected";
-    public static final String DEVICE_DOMAIN_DETACHED = "device.detached";
+    private static final String DEVICE_DOMAIN = "device.";
+    public static final String DEVICE_DOMAIN_DATA = DEVICE_DOMAIN + "data";
+    public static final String DEVICE_DOMAIN_ERROR = DEVICE_DOMAIN + "error";
+    public static final String DEVICE_DOMAIN_CONNECTING = DEVICE_DOMAIN + "connecting";
+    public static final String DEVICE_DOMAIN_CONNECTED = DEVICE_DOMAIN + "connected";
+    public static final String DEVICE_DOMAIN_DETACHED = DEVICE_DOMAIN + "detached";
 
     public static final String ACTION_USB_DEVICE_FIND = "tmk.cordova.plugin.usb.device.USB_DEVICE_FIND";
 
