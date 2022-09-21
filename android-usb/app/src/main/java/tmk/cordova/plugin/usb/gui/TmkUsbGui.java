@@ -9,15 +9,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.NoArgsConstructor;
-
 import static org.apache.cordova.PluginResult.Status.ERROR;
 import static org.apache.cordova.PluginResult.Status.OK;
 import static tmk.cordova.plugin.usb.log.TmkUsbLogging.getTime;
 import static tmk.cordova.plugin.usb.log.TmkUsbLogging.logtmk;
 
-@NoArgsConstructor
 public class TmkUsbGui {
+
+    public TmkUsbGui() {
+    }
 
     public static final String GUI_DOMAIN = "gui";
     public static final String tag = "tug";

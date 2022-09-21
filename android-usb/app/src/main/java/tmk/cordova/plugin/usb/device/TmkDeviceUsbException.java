@@ -2,9 +2,6 @@ package tmk.cordova.plugin.usb.device;
 
 import android.hardware.usb.UsbDevice;
 
-import lombok.Getter;
-
-@Getter
 public class TmkDeviceUsbException extends Exception {
 
     private UsbDevice device;
@@ -20,5 +17,9 @@ public class TmkDeviceUsbException extends Exception {
     public TmkDeviceUsbException(final String msg, UsbDevice device) {
         super(msg);
         this.device = device;
+    }
+
+    public UsbDevice getDevice() {
+        return device;
     }
 }

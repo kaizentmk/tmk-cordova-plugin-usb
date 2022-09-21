@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 
-import lombok.Getter;
-
-@Getter
 public class TmkUsbDevice {
     public static final String tag = "tud::";
 
@@ -52,5 +49,17 @@ public class TmkUsbDevice {
         context.sendBroadcast(new Intent(ACTION_USB_DEVICE_ERROR)
                 .putExtra(ACTION_USB_DEVICE_ERROR,
                         new TmkDeviceUsbException(msg + "," + t.getMessage(), t)));
+    }
+
+    public int getVendorId() {
+        return vendorId;
+    }
+
+    public int getProductId() {
+        return productId;
+    }
+
+    public int getBaudRate() {
+        return baudRate;
     }
 }

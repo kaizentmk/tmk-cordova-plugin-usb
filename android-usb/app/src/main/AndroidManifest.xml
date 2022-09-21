@@ -23,7 +23,7 @@
             UsbActivity is launched singleTop to avoid creating multiple activities for each event.
           -->
         <activity android:name=".UsbActivity"
-            android:launchMode="singleTop">
+            android:exported="true">
 
             <!-- Launch as default from Android Studio -->
             <intent-filter>
